@@ -1,26 +1,26 @@
 import { AgroMarApi } from '@/api/AgroMarApi';
+import { to } from '@/helpers';
+import { AxiosResponse } from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export const useFetch = <T>(url: string) => {
   const isMounted = useRef(true);
-  const [state, setState] = useState<{ data: T | null; loading: boolean; error: null }>({
+  const [state, setState] = useState<{ data: T | null; loading: boolean; error: null | string }>({
     data: null,
     loading: true,
     error: null,
   });
 
   const fetchData = useCallback(async () => {
-    try {
-      const { data } = await AgroMarApi.get(url);
+    if (!isMounted.current) return;
+    const [res, error] = await to<AxiosResponse<T>>(AgroMarApi.get(url));
 
-      if (isMounted.current) {
-        setState({ data, loading: false, error: null });
-      }
-    } catch (error) {
-      if (isMounted.current) {
-        setState({ data: null, loading: false, error: (error as any)?.message });
-      }
+    if (error) {
+      setState({ data: null, loading: false, error: error.message });
+      return;
     }
+
+    setState({ data: res.data, loading: false, error: null });
   }, [url]);
 
   useEffect(() => {
