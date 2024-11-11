@@ -6,9 +6,8 @@ import { ProfilePage } from "@/pages/ProfilePage";
 import { createBrowserRouter } from "react-router-dom";
 import { PrivateRoute } from "./PrivateRoute";
 import { AdminProductsPage } from "@/pages/admin/products/AdminProductsPage";
-import { CreateProductPage } from "@/pages/admin/products/CreateProductPage";
 import { AdminCategoriesPage } from "@/pages/admin/categories";
-import { CreateCategoryPage } from "@/pages/admin/categories/CreateCategoryPage";
+import { AdminUsersPage } from "@/pages/admin/AdminUsersPage";
 
 export const router = createBrowserRouter([
   {
@@ -36,21 +35,17 @@ export const router = createBrowserRouter([
             element: <AdminPage />,
           },
           {
-            path: '/admin/products',
-            element: <AdminProductsPage />
+            path: '/admin/users',
+            element: <AdminUsersPage />
           },
           {
-            path: '/admin/products/create',
-            element: <CreateProductPage />
+            path: '/admin/products',
+            element: <AdminProductsPage />
           },
           {
             path: '/admin/categories',
             element: <AdminCategoriesPage />
           },
-          {
-            path: '/admin/categories/create',
-            element: <CreateCategoryPage />
-          }
         ]
       }
     ],

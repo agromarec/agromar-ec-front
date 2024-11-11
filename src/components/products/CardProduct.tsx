@@ -3,6 +3,7 @@ import { Badge } from "../ui/badge";
 import { formatter } from "@/helpers";
 import { Eye, ShoppingCart } from "lucide-react";
 import { Button } from "../ui/button";
+import { globalVariables } from "@/config/globalVariables";
 
 interface CardProductProps {
   product: IProduct;
@@ -15,7 +16,7 @@ export const CardProduct = ({ product, onOpenDetails, onAddToCart }: CardProduct
     <div className="flex flex-col rounded-lg max-w-[350px] min-w-[350px] shadow-lg h-[500px] overflow-hidden">
 
       <div className="relative max-h-[350px] overflow-hidden">
-        <img src="https://nestjs.com/img/nest-og.png" alt={product.predefinedProduct.name} width={350} className="object-cover rounded-lg rounded-b-none h-[280px] hover:scale-105 transition-transform" />
+        <img src={`${globalVariables.fileUrl}${product.image}`} alt={product.predefinedProduct.name} width={350} className="object-cover rounded-lg rounded-b-none h-[280px] hover:scale-105 transition-transform" />
 
         <Badge className="bg-indigo-500 absolute bottom-2 left-2">{product.predefinedProduct.category.name}</Badge>
       </div>

@@ -1,6 +1,6 @@
 
 interface NumberFormatOptions extends Intl.NumberFormatOptions {
-  as?: 'currency';
+  as?: 'currency' | 'number';
   value?: number;
 }
 
@@ -16,11 +16,13 @@ type FormatterControllerProps = NumberFormatOptions & DateOptions;
 
 const FormatterController = {
   'currency': (props: NumberFormatOptions) => (new Intl.NumberFormat('en-US', {
-    style: props.as,
+    style: 'currency',
     currency: props.currency || 'USD',
     minimumFractionDigits: props.minimumFractionDigits || 2,
     maximumFractionDigits: props.maximumFractionDigits || 2,
   }).format(props.value || 0)),
+
+  'number': (props: NumberFormatOptions) => (new Intl.NumberFormat('en-US', { ...props }).format(props.value || 0)),
 
   'date': (props: DateOptions) => (new Intl.DateTimeFormat(props.language || 'en-US', {
     dateStyle: props.dateStyle,

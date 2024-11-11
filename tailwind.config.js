@@ -23,6 +23,7 @@ export default {
 				'fade-in': 'fade-in 1s ease-in-out',
 				'top-fade-in': 'top-fade-in 0.5s ease-in-out',
 			},
+
 			colors: {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',

@@ -35,5 +35,27 @@ export const useFetch = <T>(url: string) => {
     fetchData();
   }, [fetchData]);
 
-  return state;
+  // const mutate = useCallback(async (data: any) => {
+  //   if (!isMounted.current) return;
+  //   setState({ data: null, loading: true, error: null });
+
+  //   const [res, error] = await to<AxiosResponse<T>>(AgroMarApi.post(url, data));
+
+  //   if (error) {
+  //     setState({ data: null, loading: false, error: error.message });
+  //     return;
+  //   }
+
+  //   setState({ data: res.data, loading: false, error: null });
+  // }, [url]);
+
+  const refetch = useCallback(async () => {
+    setState({ data: null, loading: true, error: null });
+    await fetchData();
+  }, [fetchData]);
+
+  return {
+    ...state,
+    refetch,
+  };
 };
