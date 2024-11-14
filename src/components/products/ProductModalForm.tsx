@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
@@ -16,6 +15,7 @@ import { IUnitOfMesureResponse } from "@/interfaces/unit-of-mesure";
 import { IProduct, IProductResponse } from "@/interfaces/products";
 import { AgroMarApi } from "@/api/AgroMarApi";
 import { AxiosResponse } from "axios";
+import { LoaderBtn } from "../ui/LoaderBtn";
 
 interface ProductModalFormProps {
   isOpen: boolean;
@@ -31,7 +31,7 @@ export const ProductModalForm = ({ isOpen, onClose, onSuccess, productToUpdate }
         <DialogHeader>
           <DialogTitle>Crear Producto</DialogTitle>
           <DialogDescription>
-            <CreateOrUpdateProductForm onSuccess={onSuccess} initialValues={productToUpdate} />
+            <CreateOrUpdateProductForm onSuccess={onSuccess} initialValues={productToUpdate} onCancel={onClose} />
           </DialogDescription>
         </DialogHeader>
       </DialogContent>
@@ -52,7 +52,7 @@ const formSchema = z.object({
   .refine(data => Number(data.price.replace(',', '')) > 0, { message: "Precio no puede ser 0", path: ["price"] })
   .refine(data => (data.image?.size || 0) < 10 * 1024 * 1024, { message: "El archivo es muy pesado, por favor, suba un archivo menor de 10MB", path: ["image"] })
 
-export function CreateOrUpdateProductForm(props: { initialValues?: IProduct | null, onSuccess?: () => void }) {
+export function CreateOrUpdateProductForm(props: { initialValues?: IProduct | null, onSuccess?: () => void, onCancel: () => void }) {
   const { data: predefinedProduct } = useFetch<IPredifinedProductResponse[]>('/predefined-product');
   const { data: unitOfMesure } = useFetch<IUnitOfMesureResponse[]>('/unit-of-mesures');
   const form = useForm<z.infer<typeof formSchema>>({
@@ -254,15 +254,13 @@ export function CreateOrUpdateProductForm(props: { initialValues?: IProduct | nu
         </div>
 
         <div className="flex justify-between items-center">
-          <Button disabled={form.formState.isSubmitting} variant={'secondary'}>
-            <Loader className={`h-4 w-4 animate-spin ${form.formState.isSubmitting ? 'block' : 'hidden'}`} />
-            <span className={`${form.formState.isSubmitting ? 'hidden' : 'block'}`}>Cancelar</span>
+          <Button disabled={form.formState.isSubmitting} variant={'secondary'} onClick={props.onCancel}>
+            Cancelar
           </Button>
 
-          <Button type="submit" disabled={form.formState.isSubmitting}>
-            <Loader className={`h-4 w-4 animate-spin ${form.formState.isSubmitting ? 'block' : 'hidden'}`} />
-            <span className={`${form.formState.isSubmitting ? 'hidden' : 'block'}`}>{props.initialValues ? 'Actualizar Producto' : 'Crear Producto'}</span>
-          </Button>
+          <LoaderBtn isLoading={form.formState.isSubmitting} type="submit" disabled={form.formState.isSubmitting}>
+            {props.initialValues ? 'Actualizar Producto' : 'Crear Producto'}
+          </LoaderBtn>
         </div>
       </form>
     </Form>

@@ -1,16 +1,22 @@
+import { AgroMarApi } from "@/api/AgroMarApi";
 import { DataTable } from "@/components/data-table";
 import { Button } from "@/components/ui/button";
+import { CreateUserModal } from "@/components/users/CreateUserModal";
+import { to } from "@/helpers";
 import { useFetch } from "@/hooks";
 import { IUserResponse } from "@/interfaces/users";
 import useUiStore from "@/store/uiStore";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import { ColumnDef } from "@tanstack/react-table";
 import { PencilLine, Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from 'react';
+import { toast } from "sonner";
 
 export const AdminUsersPage = () => {
-  const { data } = useFetch<IUserResponse[]>('/users');
+  const { data, refetch } = useFetch<IUserResponse[]>('/users');
   const setDialogOpts = useUiStore(state => state.setDialogOptions);
+  const [isOpenCreateUserModal, setIsOpenCreateUserModal] = useState(false);
+  const userToUpdateRef = useRef<IUserResponse|null>(null);
 
   const columns: ColumnDef<IUserResponse>[] = useMemo(() => (
     [
@@ -75,20 +81,59 @@ export const AdminUsersPage = () => {
         },
       },
       {
+        id: "Celular",
+        accessorKey: "phone",
+        cell: ({ row }) => {
+          return <div className="text-center font-medium">{row.original.phone}</div>
+        },
+        header: ({ column }) => {
+          return (
+            <div className="flex justify-center">
+              <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              >
+                Celular
+                <CaretSortIcon className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          )
+        },
+      },
+      {
+        id: "Dirección",
+        accessorKey: "address",
+        cell: ({ row }) => {
+          return <div className="text-center font-medium">{row.original.address}</div>
+        },
+        header: ({ column }) => {
+          return (
+            <div className="flex justify-center">
+              <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              >
+                Dirección
+                <CaretSortIcon className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          )
+        },
+      },
+      {
         id: "actions",
         enableHiding: false,
         header: () => <div className="text-center">Acciones</div>,
         cell: ({ row }) => {
-          const rowData = row.original
-
+          const rowData = row.original;
           return (
             <ol className="flex items-center space-x-2 text-center justify-center">
               <li>
                 <Button variant="ghost" className="h-8 w-8 p-0"
-                  // onClick={() => {
-                  //   productToUpdateRef.current = rowData;
-                  //   setIsOpenCreateProductModal(true)
-                  // }}
+                onClick={() => {
+                  userToUpdateRef.current = rowData;
+                  setIsOpenCreateUserModal(true);
+                }}
                 >
                   <PencilLine className="h-4 w-4" />
                 </Button>
@@ -103,10 +148,13 @@ export const AdminUsersPage = () => {
                     isLoading: false,
                     btnAcceptText: 'Eliminar',
                     btnCancelText: 'Cancelar',
-                    // onClose: () => setDialogOpts({ open: false }),
-                    onAccept: () => {
-                      console.log(rowData.id);
+                    onAccept: async() => {
                       setDialogOpts(state => ({ ...state, isLoading: true }));
+                      const [, error] = await to(AgroMarApi.delete(`/users/${rowData.id}`));
+                      if (error) return toast.error(error.message);
+                      refetch();
+                      toast.success('Usuario eliminado exitosamente');
+                      setDialogOpts(state => ({ ...state, isLoading: false, open: false }));
                     },
                   })}
                 >
@@ -128,7 +176,20 @@ export const AdminUsersPage = () => {
         columns={columns}
         data={data || []}
         createText="Nuevo usuario"
-        // onCreate={() => setIsOpenCreateProductModal(true)}
+        onCreate={() => setIsOpenCreateUserModal(true)}
+      />
+
+      <CreateUserModal
+        isOpen={isOpenCreateUserModal}
+        user={userToUpdateRef.current}
+        onClose={() => {
+          userToUpdateRef.current = null;
+          setIsOpenCreateUserModal(false)
+        }}
+        onSuccess={() => {
+          refetch();
+          setIsOpenCreateUserModal(false);
+        }}
       />
     </div>
   )
