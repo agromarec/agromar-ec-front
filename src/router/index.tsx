@@ -8,6 +8,9 @@ import { PrivateRoute } from "./PrivateRoute";
 import { AdminProductsPage } from "@/pages/admin/products/AdminProductsPage";
 import { AdminCategoriesPage } from "@/pages/admin/categories";
 import { AdminUsersPage } from "@/pages/admin/AdminUsersPage";
+import { AdminMeasurePage } from "@/pages/admin/AdminMeasurePage";
+import { AdminParentProductPage } from "@/pages/admin/AdminParentProductPage";
+import { CartPage } from "@/pages/CartPage";
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +28,16 @@ export const router = createBrowserRouter([
       {
         path: 'productos',
         element: <ProductsPage />,
+      },
+      {
+        path: 'cart',
+        element: <PrivateRoute />,
+        children: [
+          {
+            path: '/cart',
+            element: <CartPage />,
+          },
+        ]
       },
       {
         path: 'admin',
@@ -45,6 +58,14 @@ export const router = createBrowserRouter([
           {
             path: '/admin/categories',
             element: <AdminCategoriesPage />
+          },
+          {
+            path: '/admin/units',
+            element: <AdminMeasurePage />
+          },
+          {
+            path: '/admin/predefined-products',
+            element: <AdminParentProductPage />
           },
         ]
       }

@@ -5,10 +5,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { LoaderBtn } from "@/components/ui/LoaderBtn";
-import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { to } from "@/helpers";
 import { useFetch } from "@/hooks";
-import { IProductCategory } from "@/interfaces/predifined-product";
+import { IPredifinedProductResponse, IProductCategory, IUnitOfMeasure } from "@/interfaces/predifined-product";
 import useUiStore from "@/store/uiStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CaretSortIcon } from "@radix-ui/react-icons";
@@ -21,13 +21,13 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 
-export const AdminCategoriesPage = () => {
-  const { data, refetch } = useFetch<any>('/product-categories');
+export const AdminParentProductPage = () => {
+  const { data, refetch } = useFetch<any>('/predefined-product');
   const setDialogOpts = useUiStore(state => state.setDialogOptions);
   const [isOpenCreateCategoryModal, setIsOpenCreateCategoryModal] = useState(false);
-  const categoryToUpdateRef = useRef<IProductCategory | null>(null);
+  const parentProductToUpdateRef = useRef<IPredifinedProductResponse | null>(null);
 
-  const columns: ColumnDef<IProductCategory>[] = useMemo(() => (
+  const columns: ColumnDef<IPredifinedProductResponse>[] = useMemo(() => (
     [
       {
         id: "Nombre",
@@ -48,8 +48,8 @@ export const AdminCategoriesPage = () => {
         cell: ({ row }) => <div className="text-center">{row.original.name}</div>,
       },
       {
-        id: "Descripción",
-        accessorKey: "description",
+        id: "Categoría",
+        accessorKey: "category.name",
         header: ({ column }) => {
           return (
             <div className="flex justify-center">
@@ -57,13 +57,13 @@ export const AdminCategoriesPage = () => {
                 variant="ghost"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
               >
-                Descripción
+                Categoría
                 <CaretSortIcon className="ml-2 h-4 w-4" />
               </Button>
             </div>
           )
         },
-        cell: ({ row }) => <div className="text-center">{row.original.description}</div>,
+        cell: ({ row }) => <div className="text-center">{row.original.category?.name}</div>,
       },
       {
         id: "Estado",
@@ -95,7 +95,7 @@ export const AdminCategoriesPage = () => {
               <li>
                 <Button variant="ghost" className="h-8 w-8 p-0"
                   onClick={() => {
-                    categoryToUpdateRef.current = rowData;
+                    parentProductToUpdateRef.current = rowData;
                     setIsOpenCreateCategoryModal(true)
                   }}
                 >
@@ -107,14 +107,14 @@ export const AdminCategoriesPage = () => {
                 <Button variant="ghost" className="h-8 w-8 p-0"
                   onClick={() => setDialogOpts({
                     title: '¿Estás seguro?',
-                    description: 'Estás seguro que deseas eliminar este producto? Esta acción no se puede deshacer',
+                    description: 'Estás seguro que deseas eliminar este registro? Esta acción no se puede deshacer',
                     open: true,
                     isLoading: false,
                     btnAcceptText: 'Eliminar',
                     btnCancelText: 'Cancelar',
                     onAccept: async () => {
                       setDialogOpts(state => ({ ...state, isLoading: true }));
-                      const [, error] = await to(AgroMarApi.delete(`/product-categories/${rowData.id}`));
+                      const [, error] = await to(AgroMarApi.delete(`/predefined-product/${rowData.id}`));
                       if (error) {
                         toast.error(error.message);
                         setDialogOpts(state => ({ ...state, isLoading: false, open: false }));
@@ -138,25 +138,25 @@ export const AdminCategoriesPage = () => {
 
   return (
     <div className="container mx-auto my-12">
-      <h1 className="text-center text-4xl font-bold mt-16 mb-4">Categorias</h1>
+      <h1 className="text-center text-4xl font-bold mt-16 mb-4">Producto Padre</h1>
 
       <DataTable
         columns={columns}
         data={data || []}
-        createText="Nueva categoría"
+        createText="Nuevo producto padre"
         onCreate={() => setIsOpenCreateCategoryModal(true)}
       />
 
-      <CreateCategoryModal 
-        category={categoryToUpdateRef.current}
+      <CreateUnitOfMeasureModal
+        parentProduct={parentProductToUpdateRef.current}
         isOpen={isOpenCreateCategoryModal}
         onClose={() => {
-          categoryToUpdateRef.current = null;
+          parentProductToUpdateRef.current = null;
           setIsOpenCreateCategoryModal(false);
         }}
         onSuccess={() => {
           refetch();
-          categoryToUpdateRef.current = null;
+          parentProductToUpdateRef.current = null;
           setIsOpenCreateCategoryModal(false);
         }}
       />
@@ -164,51 +164,57 @@ export const AdminCategoriesPage = () => {
   )
 };
 
-interface CreateCategoryModalProps {
-  category: IProductCategory | null;
+interface Props {
+  parentProduct: IPredifinedProductResponse | null;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-const CreateCategoryModal = ({ isOpen, onClose, onSuccess, category }: CreateCategoryModalProps) => {
+const CreateUnitOfMeasureModal = ({ isOpen, onClose, onSuccess, parentProduct }: Props) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose} modal>
       <DialogContent className="max-w-[800px]">
         <DialogHeader>
-          <DialogTitle>Nueva Categoría</DialogTitle>
+          <DialogTitle>{parentProduct ? 'Actualizar Producto Padre' : 'Nuevo Producto Padre'}</DialogTitle>
         </DialogHeader>
-        <CreateOrUpdateCategoryForm onSuccess={onSuccess} initialValues={category} onCancel={onClose} />
+        <CreateOrUpdateParentProductForm onSuccess={onSuccess} initialValues={parentProduct} onCancel={onClose} />
       </DialogContent>
     </Dialog>
   )
 };
 
-interface CreateOrUpdateUserFormProps {
-  initialValues: IProductCategory | null;
+interface CreateOrUpdateMeasureFormProps {
+  initialValues: IPredifinedProductResponse | null;
   onSuccess: () => void;
   onCancel: () => void;
 }
 
 const formSchema = z.object({
   name: z.string().min(1),
-  description: z.string().min(4),
+  categoryId: z.string().min(1),
 });
 
-const CreateOrUpdateCategoryForm = (props: CreateOrUpdateUserFormProps) => {
+const CreateOrUpdateParentProductForm = (props: CreateOrUpdateMeasureFormProps) => {
+  const { data } = useFetch<IProductCategory[]>('/product-categories');
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: props.initialValues ? {
       name: props.initialValues.name,
-      description: props.initialValues.description,
+      categoryId: props.initialValues.category_id.toString(),
     } : {
       name: "",
-      description: "",
+      categoryId: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const [, error] = props.initialValues ? await to<AxiosResponse<IProductCategory>>(AgroMarApi.patch(`/product-categories/${props.initialValues.id}`, values)) : await to<AxiosResponse<IProductCategory>>(AgroMarApi.post('/product-categories', values));
+    const data = {
+      name: values.name,
+      category_id: Number(values.categoryId),
+    }
+
+    const [, error] = props.initialValues ? await to<AxiosResponse<IUnitOfMeasure>>(AgroMarApi.patch(`/predefined-product/${props.initialValues.id}`, data)) : await to<AxiosResponse<IUnitOfMeasure>>(AgroMarApi.post('/predefined-product', data));
 
     if (error) {
       toast.error(error.message);
@@ -240,13 +246,24 @@ const CreateOrUpdateCategoryForm = (props: CreateOrUpdateUserFormProps) => {
 
           <FormField
             control={form.control}
-            name="description"
+            name="categoryId"
             render={({ field }) => (
               <FormItem className="col-span-2">
-                <FormLabel>Descripción</FormLabel>
-                <FormControl>
-                  <Textarea  {...field} className="default-input resize-none" placeholder="Descripción" />
-                </FormControl>
+                <FormLabel>Categoría</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={data?.length ? 'Seleccione una categoría' : 'No se han encontrado categorías'} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {
+                      data?.map(item => (
+                        <SelectItem key={item.id} value={item.id.toString()}>{item.name}</SelectItem>
+                      ))
+                    }
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -259,7 +276,7 @@ const CreateOrUpdateCategoryForm = (props: CreateOrUpdateUserFormProps) => {
           </Button>
 
           <LoaderBtn isLoading={form.formState.isSubmitting} type="submit" disabled={form.formState.isSubmitting}>
-            {props.initialValues ? 'Actualizar Categoria' : 'Crear Categoria'}
+            {props.initialValues ? 'Actualizar Producto' : 'Crear Producto'}
           </LoaderBtn>
         </div>
       </form>

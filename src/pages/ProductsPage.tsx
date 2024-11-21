@@ -1,12 +1,16 @@
 import { ProductList } from "@/components";
+import { Spinner } from "@/components/common/Spinner";
 import { useFetch } from "@/hooks";
+import { IProductResponse } from "@/interfaces/products";
 
 
 export const ProductsPage = () => {
-  const { data, loading, error } = useFetch<any>('/products');
+  const { data, loading, error } = useFetch<IProductResponse>('/products');
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <Spinner isLoading={loading} />
+    )
   }
 
   if (error) {
@@ -15,7 +19,10 @@ export const ProductsPage = () => {
 
   return (
     <div>
-      <ProductList data={data} />
+      {
+        !!data &&
+        <ProductList data={data} />
+      }
     </div>
   )
 };

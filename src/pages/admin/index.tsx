@@ -1,46 +1,49 @@
+import { useFetch } from "@/hooks"
 import { LucideProps, PencilRuler, Shapes, ShoppingBasket, Store, Users } from "lucide-react"
-import { RefAttributes } from "react"
+import { RefAttributes, useMemo } from "react"
 import { Link } from "react-router-dom"
 
-const cards = [
-  {
-    label: 'Usuarios',
-    count: 10,
-    icon: (props: Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>) => <Users {...props} />,
-    href: '/admin/users',
-    bgColor: 'bg-rose-500',
-  },
-  {
-    label: 'Productos',
-    count: 10,
-    icon: (props: Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>) => <Store {...props} />,
-    href: '/admin/products',
-    bgColor: 'bg-indigo-400',
-  },
-  {
-    label: 'Categorías',
-    count: 10,
-    icon: (props: Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>) => <Shapes {...props} />,
-    href: '/admin/categories',
-    bgColor: 'bg-green-400',
-  },
-  {
-    label: 'Unidad de Medida',
-    count: 10,
-    icon: (props: Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>) => <PencilRuler {...props} />,
-    href: '/admin/units',
-    bgColor: 'bg-purple-400',
-  },
-  {
-    label: 'Producto Padre',
-    count: 10,
-    icon: (props: Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>) => <ShoppingBasket {...props} />,
-    href: '/admin/predefined-products',
-    bgColor: 'bg-orange-400',
-  }
-]
-
 export function AdminPage() {
+  const { data } = useFetch<any>('/quantity');
+
+  const cards = useMemo(() => [
+    {
+      label: 'Usuarios',
+      count: data?.usersQuantity || 0,
+      icon: (props: Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>) => <Users {...props} />,
+      href: '/admin/users',
+      bgColor: 'bg-rose-500',
+    },
+    {
+      label: 'Productos',
+      count: data?.productQuantity || 0,
+      icon: (props: Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>) => <Store {...props} />,
+      href: '/admin/products',
+      bgColor: 'bg-indigo-400',
+    },
+    {
+      label: 'Categorías',
+      count: data?.productCategoryQuantity || 0,
+      icon: (props: Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>) => <Shapes {...props} />,
+      href: '/admin/categories',
+      bgColor: 'bg-green-400',
+    },
+    {
+      label: 'Unidad de Medida',
+      count: data?.unitOfMeasureQuantity || 0,
+      icon: (props: Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>) => <PencilRuler {...props} />,
+      href: '/admin/units',
+      bgColor: 'bg-purple-400',
+    },
+    {
+      label: 'Producto Padre',
+      count: data?.predefinedProductQuantity || 0,
+      icon: (props: Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>) => <ShoppingBasket {...props} />,
+      href: '/admin/predefined-products',
+      bgColor: 'bg-orange-400',
+    }
+  ], [data]);
+
   return (
     <div>
       <h1 className="text-center mt-14 font-bold text-4xl">Vista Administrativa</h1>

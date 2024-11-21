@@ -5,6 +5,8 @@ import { formatter } from "@/helpers";
 import { Button } from "../ui/button";
 import { Send } from "lucide-react";
 import useAuthStore from "@/store/auht";
+import { globalVariables } from "@/config/globalVariables";
+import { CartButton } from "../common/CartButton";
 
 interface ProductDetailsProps {
   isOpen: boolean;
@@ -27,7 +29,7 @@ export const ProductDetails = ({ isOpen, onClose, product }: ProductDetailsProps
 
             <div className="flex gap-4 h-full py-12">
               {/* <div className="my-auto"> */}
-              <img src="https://nestjs.com/img/nest-og.png" alt={product.predefinedProduct.name} width={400} className="object-cover rounded-lg h-[280px] my-auto" />
+              <img src={globalVariables.fileUrl + product.image} alt={product.predefinedProduct.name} width={400} className="object-cover rounded-lg h-[280px] my-auto" />
               {/* </div> */}
 
               <DialogDescription className="flex h-full text-black w-full gap-4">
@@ -50,10 +52,7 @@ export const ProductDetails = ({ isOpen, onClose, product }: ProductDetailsProps
                   </div>
 
                   <div className="flex flex-col w-full gap-3 mt-4">
-                    <Button onClick={()=> {
-                      if (authStatus === 'unauthenticated') return onOpenLoginModal();
-                      console.log('Agregar al carrito');
-                    }}>Agregar al carrito</Button>
+                    <CartButton product={product} type="solid" />
 
                     <Button variant="outline"
                       onClick={() => {
@@ -69,9 +68,9 @@ export const ProductDetails = ({ isOpen, onClose, product }: ProductDetailsProps
                 <div className="flex flex-col justify-start h-full gap-2 flex-1">
                   <p className="font-bold text-lg">Comentarios</p>
                   <div className="h-full border-primary-400 border-2 shadow-sm rounded-lg"></div>
-                  <Textarea className="resize-none h-1/6 w-full" />
+                  <Textarea className="resize-none h-1/6 w-full" placeholder="Escribe aquí tu comentario" />
 
-                  <Button variant="outline"
+                  <Button variant="default"
                     onClick={() => {
                       if (authStatus === 'unauthenticated') return onOpenLoginModal();
                       console.log('Enviar');

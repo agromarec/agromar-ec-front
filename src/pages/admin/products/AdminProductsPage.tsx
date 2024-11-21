@@ -2,7 +2,7 @@ import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/data-table"
 import { ColumnDef } from "@tanstack/react-table"
-import { formatter } from "@/helpers"
+import { formatter, to } from "@/helpers"
 import { PencilLine, Trash2 } from "lucide-react"
 import { useFetch } from "@/hooks";
 import { IProduct, IProductResponse } from "@/interfaces/products";
@@ -10,8 +10,8 @@ import { useMemo, useRef, useState } from "react";
 import { ProductModalForm } from "@/components/products/ProductModalForm";
 import { globalVariables } from "@/config/globalVariables";
 import useUiStore from "@/store/uiStore";
-
-
+import { toast } from "sonner";
+import { AgroMarApi } from "@/api/AgroMarApi";
 
 export const AdminProductsPage = () => {
   const { data, refetch } = useFetch<IProductResponse>('/products?page=1&size=99999');
@@ -168,9 +168,13 @@ export const AdminProductsPage = () => {
                     btnAcceptText: 'Eliminar',
                     btnCancelText: 'Cancelar',
                     // onClose: () => setDialogOpts({ open: false }),
-                    onAccept: () => {
-                      console.log(rowData.id);
+                    onAccept: async () => {
                       setDialogOpts(state => ({ ...state, isLoading: true }));
+                      const [, error] = await to(AgroMarApi.delete(`/products/${rowData.id}`));
+                      if (error) return toast.error(error.message);
+                      refetch();
+                      toast.success('Producto eliminado exitosamente');
+                      setDialogOpts(state => ({ ...state, isLoading: false, open: false }));
                     },
                   })}
                 >
@@ -197,10 +201,14 @@ export const AdminProductsPage = () => {
 
       <ProductModalForm
         isOpen={isOpenCreateProductModal}
-        onClose={() => setIsOpenCreateProductModal(false)}
+        onClose={() => {
+          productToUpdateRef.current = null;
+          setIsOpenCreateProductModal(false);
+        }}
         productToUpdate={productToUpdateRef.current}
         onSuccess={() => {
           refetch();
+          productToUpdateRef.current = null;
           setIsOpenCreateProductModal(false);
         }}
       />

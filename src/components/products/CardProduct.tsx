@@ -1,17 +1,17 @@
 import { IProduct } from "@/interfaces/products";
 import { Badge } from "../ui/badge";
 import { formatter } from "@/helpers";
-import { Eye, ShoppingCart } from "lucide-react";
+import { Eye } from "lucide-react";
 import { Button } from "../ui/button";
 import { globalVariables } from "@/config/globalVariables";
+import { CartButton } from "../common/CartButton";
 
 interface CardProductProps {
   product: IProduct;
-  onAddToCart: (product: IProduct) => void;
   onOpenDetails: (product: IProduct) => void;
 }
 
-export const CardProduct = ({ product, onOpenDetails, onAddToCart }: CardProductProps) => {
+export const CardProduct = ({ product, onOpenDetails }: CardProductProps) => {
   return (
     <div className="flex flex-col rounded-lg max-w-[350px] min-w-[350px] shadow-lg h-[500px] overflow-hidden">
 
@@ -33,9 +33,7 @@ export const CardProduct = ({ product, onOpenDetails, onAddToCart }: CardProduct
           <Eye size={24} width={'3rem'} height={'3rem'} />
         </Button>
 
-        <Button variant="ghost" size='icon' className="[&_svg]:size-6" onClick={() => onAddToCart(product)}>
-          <ShoppingCart size={20} />
-        </Button>
+        <CartButton product={product} type="ghost" />
       </div>
     </div>
   )

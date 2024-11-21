@@ -8,7 +8,7 @@ import { LoaderBtn } from "@/components/ui/LoaderBtn";
 import { Textarea } from "@/components/ui/textarea";
 import { to } from "@/helpers";
 import { useFetch } from "@/hooks";
-import { IProductCategory } from "@/interfaces/predifined-product";
+import { IUnitOfMeasure } from "@/interfaces/predifined-product";
 import useUiStore from "@/store/uiStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CaretSortIcon } from "@radix-ui/react-icons";
@@ -21,13 +21,13 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 
-export const AdminCategoriesPage = () => {
-  const { data, refetch } = useFetch<any>('/product-categories');
+export const AdminMeasurePage = () => {
+  const { data, refetch } = useFetch<any>('/unit-of-mesures');
   const setDialogOpts = useUiStore(state => state.setDialogOptions);
   const [isOpenCreateCategoryModal, setIsOpenCreateCategoryModal] = useState(false);
-  const categoryToUpdateRef = useRef<IProductCategory | null>(null);
+  const UnitOfMeasureToUpdateRef = useRef<IUnitOfMeasure | null>(null);
 
-  const columns: ColumnDef<IProductCategory>[] = useMemo(() => (
+  const columns: ColumnDef<IUnitOfMeasure>[] = useMemo(() => (
     [
       {
         id: "Nombre",
@@ -48,8 +48,8 @@ export const AdminCategoriesPage = () => {
         cell: ({ row }) => <div className="text-center">{row.original.name}</div>,
       },
       {
-        id: "Descripción",
-        accessorKey: "description",
+        id: "Abreviatura",
+        accessorKey: "abreviature",
         header: ({ column }) => {
           return (
             <div className="flex justify-center">
@@ -57,13 +57,13 @@ export const AdminCategoriesPage = () => {
                 variant="ghost"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
               >
-                Descripción
+                Abreviatura
                 <CaretSortIcon className="ml-2 h-4 w-4" />
               </Button>
             </div>
           )
         },
-        cell: ({ row }) => <div className="text-center">{row.original.description}</div>,
+        cell: ({ row }) => <div className="text-center">{row.original.abreviature}</div>,
       },
       {
         id: "Estado",
@@ -95,7 +95,7 @@ export const AdminCategoriesPage = () => {
               <li>
                 <Button variant="ghost" className="h-8 w-8 p-0"
                   onClick={() => {
-                    categoryToUpdateRef.current = rowData;
+                    UnitOfMeasureToUpdateRef.current = rowData;
                     setIsOpenCreateCategoryModal(true)
                   }}
                 >
@@ -107,14 +107,14 @@ export const AdminCategoriesPage = () => {
                 <Button variant="ghost" className="h-8 w-8 p-0"
                   onClick={() => setDialogOpts({
                     title: '¿Estás seguro?',
-                    description: 'Estás seguro que deseas eliminar este producto? Esta acción no se puede deshacer',
+                    description: 'Estás seguro que deseas eliminar este registro? Esta acción no se puede deshacer',
                     open: true,
                     isLoading: false,
                     btnAcceptText: 'Eliminar',
                     btnCancelText: 'Cancelar',
                     onAccept: async () => {
                       setDialogOpts(state => ({ ...state, isLoading: true }));
-                      const [, error] = await to(AgroMarApi.delete(`/product-categories/${rowData.id}`));
+                      const [, error] = await to(AgroMarApi.delete(`/unit-of-mesures/${rowData.id}`));
                       if (error) {
                         toast.error(error.message);
                         setDialogOpts(state => ({ ...state, isLoading: false, open: false }));
@@ -138,25 +138,25 @@ export const AdminCategoriesPage = () => {
 
   return (
     <div className="container mx-auto my-12">
-      <h1 className="text-center text-4xl font-bold mt-16 mb-4">Categorias</h1>
+      <h1 className="text-center text-4xl font-bold mt-16 mb-4">Unidad de Medida</h1>
 
       <DataTable
         columns={columns}
         data={data || []}
-        createText="Nueva categoría"
+        createText="Nueva unidad de medida"
         onCreate={() => setIsOpenCreateCategoryModal(true)}
       />
 
-      <CreateCategoryModal 
-        category={categoryToUpdateRef.current}
+      <CreateUnitOfMeasureModal
+        measure={UnitOfMeasureToUpdateRef.current}
         isOpen={isOpenCreateCategoryModal}
         onClose={() => {
-          categoryToUpdateRef.current = null;
+          UnitOfMeasureToUpdateRef.current = null;
           setIsOpenCreateCategoryModal(false);
         }}
         onSuccess={() => {
           refetch();
-          categoryToUpdateRef.current = null;
+          UnitOfMeasureToUpdateRef.current = null;
           setIsOpenCreateCategoryModal(false);
         }}
       />
@@ -164,51 +164,51 @@ export const AdminCategoriesPage = () => {
   )
 };
 
-interface CreateCategoryModalProps {
-  category: IProductCategory | null;
+interface Props {
+  measure: IUnitOfMeasure | null;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-const CreateCategoryModal = ({ isOpen, onClose, onSuccess, category }: CreateCategoryModalProps) => {
+const CreateUnitOfMeasureModal = ({ isOpen, onClose, onSuccess, measure }: Props) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose} modal>
       <DialogContent className="max-w-[800px]">
         <DialogHeader>
-          <DialogTitle>Nueva Categoría</DialogTitle>
+          <DialogTitle>Nueva Unidad de Medida</DialogTitle>
         </DialogHeader>
-        <CreateOrUpdateCategoryForm onSuccess={onSuccess} initialValues={category} onCancel={onClose} />
+        <CreateOrUpdateMeasureForm onSuccess={onSuccess} initialValues={measure} onCancel={onClose} />
       </DialogContent>
     </Dialog>
   )
 };
 
-interface CreateOrUpdateUserFormProps {
-  initialValues: IProductCategory | null;
+interface CreateOrUpdateMeasureFormProps {
+  initialValues: IUnitOfMeasure | null;
   onSuccess: () => void;
   onCancel: () => void;
 }
 
 const formSchema = z.object({
   name: z.string().min(1),
-  description: z.string().min(4),
+  abreviature: z.string().min(1),
 });
 
-const CreateOrUpdateCategoryForm = (props: CreateOrUpdateUserFormProps) => {
+const CreateOrUpdateMeasureForm = (props: CreateOrUpdateMeasureFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: props.initialValues ? {
       name: props.initialValues.name,
-      description: props.initialValues.description,
+      abreviature: props.initialValues.abreviature,
     } : {
       name: "",
-      description: "",
+      abreviature: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const [, error] = props.initialValues ? await to<AxiosResponse<IProductCategory>>(AgroMarApi.patch(`/product-categories/${props.initialValues.id}`, values)) : await to<AxiosResponse<IProductCategory>>(AgroMarApi.post('/product-categories', values));
+    const [, error] = props.initialValues ? await to<AxiosResponse<IUnitOfMeasure>>(AgroMarApi.patch(`/unit-of-mesures/${props.initialValues.id}`, values)) : await to<AxiosResponse<IUnitOfMeasure>>(AgroMarApi.post('/unit-of-mesures', values));
 
     if (error) {
       toast.error(error.message);
@@ -240,12 +240,12 @@ const CreateOrUpdateCategoryForm = (props: CreateOrUpdateUserFormProps) => {
 
           <FormField
             control={form.control}
-            name="description"
+            name="abreviature"
             render={({ field }) => (
               <FormItem className="col-span-2">
-                <FormLabel>Descripción</FormLabel>
+                <FormLabel>Abreviatura</FormLabel>
                 <FormControl>
-                  <Textarea  {...field} className="default-input resize-none" placeholder="Descripción" />
+                  <Textarea  {...field} className="default-input resize-none" placeholder="Abreviatura" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -259,7 +259,7 @@ const CreateOrUpdateCategoryForm = (props: CreateOrUpdateUserFormProps) => {
           </Button>
 
           <LoaderBtn isLoading={form.formState.isSubmitting} type="submit" disabled={form.formState.isSubmitting}>
-            {props.initialValues ? 'Actualizar Categoria' : 'Crear Categoria'}
+            {props.initialValues ? 'Actualizar Unidad de Medida' : 'Crear Unidad de Medida'}
           </LoaderBtn>
         </div>
       </form>

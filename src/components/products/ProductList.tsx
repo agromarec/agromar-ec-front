@@ -40,7 +40,6 @@ export const ProductList = ({ data }: ProductListProps) => {
                 productRef.current = product;
                 toggleDisclosure();
               }}
-              onAddToCart={console.log}
             />
           ))
         }

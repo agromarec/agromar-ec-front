@@ -188,6 +188,7 @@ export const AdminUsersPage = () => {
         }}
         onSuccess={() => {
           refetch();
+          userToUpdateRef.current = null;
           setIsOpenCreateUserModal(false);
         }}
       />
