@@ -70,19 +70,23 @@ const useCartStore = create<CartStore>()((set) => ({
         const { [product.id]: _, ...rest } = state.cartItems;
         return {
           cartItems: rest,
+          count: Object.keys(rest).length,
         }
       }
 
-      return {
-        cartItems: {
-          ...state.cartItems,
-          [product.id]: {
-            ...product,
-            quantity,
-          },
+      const cartItems = {
+        ...state.cartItems,
+        [product.id]: {
+          ...product,
+          quantity,
         },
+      }
+
+      return {
+        cartItems,
         subtotal: state.subtotal + product.price * quantity,
         total: state.total + product.price * quantity,
+        count: Object.keys(cartItems).length,
       }
     });
 
