@@ -11,6 +11,7 @@ import { AdminUsersPage } from "@/pages/admin/AdminUsersPage";
 import { AdminMeasurePage } from "@/pages/admin/AdminMeasurePage";
 import { AdminParentProductPage } from "@/pages/admin/AdminParentProductPage";
 import { CartPage } from "@/pages/CartPage";
+import { ChatPage } from "@/pages/ChatPage";
 
 export const router = createBrowserRouter([
   {
@@ -36,6 +37,16 @@ export const router = createBrowserRouter([
           {
             path: '/cart',
             element: <CartPage />,
+          },
+        ]
+      },
+      {
+        path: 'chat',
+        element: <PrivateRoute />,
+        children: [
+          {
+            path: '/chat',
+            element: <ChatPage />,
           },
         ]
       },
