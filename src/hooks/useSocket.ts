@@ -3,26 +3,28 @@ import { io, Socket } from 'socket.io-client';
 
 interface UseSocketOptions {
   url: string;
-  options?: any; // Opciones adicionales para el cliente de socket.io
 }
 
-export const useSocket = ({ url, options }: UseSocketOptions) => {
+export const useSocket = ({ url }: UseSocketOptions) => {
   const socket = useRef<Socket | null>(null); // Referencia al socket
   const [online, setOnline] = useState<boolean>(false); // Estado de conexión
 
   useEffect(() => {
     // Conectar al servidor al montar
-    socket.current = io(url, options);
+    socket.current = io(url, {
+      query: {
+        transports: ['websocket'],
+        token: localStorage.getItem('token'),
+      },
+    });
 
     // Actualizar el estado de conexión
     socket.current.on('connect', () => {
       setOnline(true);
-      console.log('Conectado al servidor');
     });
 
     socket.current.on('disconnect', () => {
       setOnline(false);
-      console.log('Desconectado del servidor');
     });
 
     // Limpiar conexión al desmontar
@@ -31,7 +33,7 @@ export const useSocket = ({ url, options }: UseSocketOptions) => {
         socket.current.disconnect();
       }
     };
-  }, [url, options]);
+  }, [url]);
 
   // Función para enviar eventos
   const emit = (event: string, data: any) => {

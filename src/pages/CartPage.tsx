@@ -4,6 +4,7 @@ import { globalVariables } from "@/config/globalVariables";
 import { formatter } from "@/helpers";
 import { IProduct } from "@/interfaces/products";
 import useCartStore from "@/store/cartStore";
+import { NavLink } from "react-router-dom";
 
 
 export const CartPage = () => {
@@ -11,21 +12,37 @@ export const CartPage = () => {
   const subtotal = useCartStore(state => state.subtotal);
   const total = useCartStore(state => state.total);
 
+  if (Object.keys(cartItems).length === 0) return (
+    <div className="container mx-auto pb-12">
+      <h1 className="text-4xl mx-auto text-center font-bold mt-10">Carrito de compras</h1>
+      <p className="text-center text-4xl text-gray-400 font-bold mt-24">Tu carrito está vacío</p>
+      <p className="text-center text-xl text-gray-400 mt-4">
+        Agrega algun producto a tu carrito para poder realizar la compra
+      </p>
+
+      <div className="flex justify-center mt-8">
+        <NavLink to={'/productos'} className="mt-2 text-xl">
+          <Button className="mt-2 text-xl" size={'lg'}>Ver productos</Button>
+        </NavLink>
+      </div>
+    </div>
+  )
+
   return (
     <div className="container mx-auto pb-12">
       <h1 className="text-4xl mx-auto text-center font-bold mt-10">Carrito de compras</h1>
 
       <div className="flex justify-between mt-10 gap-4">
-        <div className="flex flex-col gap-4 basis-1/3 border-2 border-gray-300 rounded-lg p-4 flex-1">
+        <div className="flex flex-col gap-4 basis-1/3 border-2 border-gray-300 rounded-lg p-4 flex-1 h-fit">
           <h2 className="text-2xl font-bold">Productos</h2>
           {
             Object.keys(cartItems).map((cartItemKey: any) => (
-              <CartItem cartItem={cartItems[cartItemKey]} />
+              <CartItem key={cartItemKey} cartItem={cartItems[cartItemKey]} />
             ))
           }
         </div>
 
-        <div className="flex flex-col gap-4 basis-[28%] border-2 border-gray-300 rounded-lg p-4 flex-1/2 max-h-fit">
+        <div className="flex flex-col gap-4 basis-[28%] border-2 border-gray-300 rounded-lg p-4 flex-1/2 h-fit">
           <p className="py-2 px-4 text-center text-sm font-bold bg-orange-500 text-white">Facturación Electrónica</p>
 
           <p className="font-bold text-xl">Entrega</p>

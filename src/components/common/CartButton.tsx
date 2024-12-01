@@ -38,7 +38,7 @@ export const CartButton = ({ product, type = 'ghost' }: CartButtonProps) => {
                   <ShoppingCart size={20} strokeWidth={2} />
                 </Button>
               ) : (
-                <Button variant="default" size="icon" className="[&_svg]:size-6" onClick={() => onOpenAuthModal()}>
+                <Button variant="default" size="icon" className="[&_svg]:size-6 w-full" onClick={() => onOpenAuthModal()}>
                   Agregar al carrito <ShoppingCart size={20} strokeWidth={2} />
                 </Button>
               )

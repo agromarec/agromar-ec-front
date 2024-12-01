@@ -30,7 +30,7 @@ export const ProductList = ({ data }: ProductListProps) => {
       </div>
 
 
-      <div className="flex items-center mt-8 px-10 basis-1/3 gap-4 flex-wrap my-12 gap-y-6">
+      <div className="flex items-center mt-8 px-10 basis-1/3 gap-4 flex-wrap my-12 gap-y-6 mx-auto">
         {
           data.products.map((product) => (
             <CardProduct

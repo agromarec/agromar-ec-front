@@ -14,6 +14,7 @@ export interface IUserResponse {
   userId: null;
   user_role: UserRole[];
   canton_ce: CantonCe;
+  isOnline: boolean;
 }
 
 export interface CantonCe {

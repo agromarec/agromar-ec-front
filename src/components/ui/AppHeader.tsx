@@ -1,9 +1,10 @@
+import { useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom"
-import { DollarSign, Lock, LogOut, MessageSquare, Settings, ShoppingCart, User } from "lucide-react";
+import { DollarSign, Lock, LogOut, MessageSquare, Settings, ShoppingCart, Store, User } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuItem } from "./dropdown-menu";
 import useAuthStore from "@/store/auht";
 import useCartStore from "@/store/cartStore";
-import { useEffect } from "react";
+import { Roles } from "@/config/globalVariables";
 
 export const AppHeader = () => {
   const authStatus = useAuthStore(state => state.status);
@@ -44,11 +45,11 @@ export const PrivateOptions = () => {
   const navigatge = useNavigate();
   const loadCart = useCartStore(state => state.loadCart);
   const count = useCartStore(state => state.count);
+  const user = useAuthStore(state => state.user);
 
   useEffect(() => {
     loadCart()
-    // eslint-disable-next-line
-  }, []);
+  }, [loadCart]);
 
   return (
     <>
@@ -84,12 +85,25 @@ export const PrivateOptions = () => {
 
           <DropdownMenuSeparator />
 
-          <NavLink to={'/admin'}>
-            <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
-              <Settings />
-              <p>Administración</p>
-            </DropdownMenuItem>
-          </NavLink>
+          {
+            user?.user_role.some(role => role.roleId === Roles.ADMIN) ? (
+              <NavLink to={'/admin'}>
+                <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
+                  <Settings />
+                  <p>Administración</p>
+                </DropdownMenuItem>
+              </NavLink>
+
+            ) : (
+              <NavLink to={'/admin/products'}>
+                <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
+                  <Store />
+                  <p>Mis Productos</p>
+                </DropdownMenuItem>
+              </NavLink>
+            )
+          }
+
 
           <NavLink to={'/cart'}>
             <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">

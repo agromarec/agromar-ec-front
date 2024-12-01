@@ -8,16 +8,31 @@ import { useFetch } from "@/hooks";
 import { IProduct, IProductResponse } from "@/interfaces/products";
 import { useMemo, useRef, useState } from "react";
 import { ProductModalForm } from "@/components/products/ProductModalForm";
-import { globalVariables } from "@/config/globalVariables";
+import { globalVariables, Roles } from "@/config/globalVariables";
 import useUiStore from "@/store/uiStore";
 import { toast } from "sonner";
 import { AgroMarApi } from "@/api/AgroMarApi";
+import useAuthStore from "@/store/auht";
 
 export const AdminProductsPage = () => {
-  const { data, refetch } = useFetch<IProductResponse>('/products?page=1&size=99999');
+  const user = useAuthStore(state => state.user);
+
+
+
+  return (
+    <div className="container mx-auto my-12">
+      <h1 className="text-center text-4xl font-bold mt-20 mb-4">Productos</h1>
+
+      <ProductsTableView url={user?.user_role.some(role => role.roleId === Roles.ADMIN) ? '/products?page=1&size=99999' : `/products/seller/${user?.id}`} />
+    </div>
+  )
+};
+
+const ProductsTableView = ({ url }: { url: string }) => {
+  const { data, refetch } = useFetch<IProductResponse>(url);
   const [isOpenCreateProductModal, setIsOpenCreateProductModal] = useState(false);
   const setDialogOpts = useUiStore(state => state.setDialogOptions);
-  const productToUpdateRef = useRef<IProduct|null>(null);
+  const productToUpdateRef = useRef<IProduct | null>(null);
 
   const columns: ColumnDef<IProduct>[] = useMemo(() => (
     [
@@ -189,9 +204,7 @@ export const AdminProductsPage = () => {
   ), []);
 
   return (
-    <div className="container mx-auto my-12">
-      <h1 className="text-center text-4xl font-bold mt-20 mb-4">Productos</h1>
-
+    <>
       <DataTable
         columns={columns}
         data={data?.products || []}
@@ -212,6 +225,6 @@ export const AdminProductsPage = () => {
           setIsOpenCreateProductModal(false);
         }}
       />
-    </div>
+    </>
   )
 };

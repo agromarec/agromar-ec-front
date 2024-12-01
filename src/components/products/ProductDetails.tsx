@@ -13,6 +13,7 @@ import { AgroMarApi } from "@/api/AgroMarApi";
 import { useRef, useState } from 'react';
 import { toast } from "sonner";
 import { LoaderBtn } from "../ui/LoaderBtn";
+import { useNavigate } from "react-router";
 
 interface ProductDetailsProps {
   isOpen: boolean;
@@ -21,7 +22,9 @@ interface ProductDetailsProps {
 }
 
 export const ProductDetails = ({ isOpen, onClose, product }: ProductDetailsProps) => {
+  const user = useAuthStore(state => state.user);
   const authStatus = useAuthStore(state => state.status);
+  const navigate = useNavigate();
   const onOpenLoginModal = useAuthStore(state => state.onOpen);
 
   if (!product) return null;
@@ -61,9 +64,12 @@ export const ProductDetails = ({ isOpen, onClose, product }: ProductDetailsProps
                     <CartButton product={product} type="solid" />
 
                     <Button variant="outline"
-                      onClick={() => {
+                      onClick={async () => {
                         if (authStatus === 'unauthenticated') return onOpenLoginModal();
-                        console.log('Enviar');
+                        if(product.seller_id === Number(user?.id)) return toast.error('No puedes crear un chat contigo mismo');
+                        const [, error] = await to(AgroMarApi.post('/chat/create-chat', { emisorId: product.seller_id }));
+                        if (error) return toast.error(error.message);
+                        navigate('/chat');
                       }}
                     >¿Tienes dudas? Escríbenos</Button>
 

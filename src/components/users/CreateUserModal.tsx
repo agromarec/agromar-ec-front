@@ -10,27 +10,24 @@ import { IUserResponse } from "@/interfaces/users";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Button } from "../ui/button";
 import { LoaderBtn } from "../ui/LoaderBtn";
-import { toast } from "sonner";
 import CustomInput from "../ui/CustomInput";
-import { to } from "@/helpers";
-import { AgroMarApi } from "@/api/AgroMarApi";
-import { AxiosResponse } from "axios";
+import useAuthStore from "@/store/auht";
 
 interface CreateUserModalProps {
   isOpen: boolean;
   user?: IUserResponse | null;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSubmit: (data: any) => void;
 }
 
-export const CreateUserModal = ({ isOpen, onClose, onSuccess, user }: CreateUserModalProps) => {
+export const CreateUserModal = ({ isOpen, onClose, onSubmit, user }: CreateUserModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose} modal>
       <DialogContent className="max-w-[800px]">
         <DialogHeader>
           <DialogTitle>Nuevo Usuario</DialogTitle>
         </DialogHeader>
-        <CreateOrUpdateUserForm onSuccess={onSuccess} initialValues={user} onCancel={onClose} />
+        <CreateOrUpdateUserForm onSubmit={onSubmit} initialValues={user} onCancel={onClose} />
       </DialogContent>
     </Dialog>
   )
@@ -56,10 +53,11 @@ const userSchema = (isUpdating: boolean) => z.object({
     : z.string({ required_error: "La contraseña es requerida" }).min(8, "Debe tener al menos 8 caracteres"),
 }).refine(data => data.password === data.confirmPassword, { message: "Las contraseñas no coinciden", path: ["confirmPassword"] })
 
-const CreateOrUpdateUserForm = ({ onSuccess, initialValues, onCancel }: { onSuccess?: () => void; initialValues?: IUserResponse | null; onCancel: () => void }) => {
+export const CreateOrUpdateUserForm = ({ onSubmit, initialValues, onCancel, isRegister = false }: { onSubmit: (data: any) => void; initialValues?: IUserResponse | null; onCancel?: () => void; isRegister?: boolean }) => {
   const { data: countries } = useFetch<ICountryResponse[]>('/country');
   const { data: provinces } = useFetch<IProvinceResponse[]>('/province');
   const { data: cantones } = useFetch<ICantonResponse[]>('/cantones');
+  const onToggleSignup = useAuthStore(state => state.onToggleSignup);
 
   const form = useForm({
     defaultValues: initialValues ? ({
@@ -88,30 +86,7 @@ const CreateOrUpdateUserForm = ({ onSuccess, initialValues, onCancel }: { onSucc
       confirmPassword: '',
     },
     resolver: zodResolver(userSchema(!!initialValues)),
-  });  
-
-  const onSubmit = async (data: any) => {
-    const newUser = {
-      name: data.name,
-      lastName: data.lastName,
-      email: data.email,
-      phone: data.phone,
-      address: data.address,
-      paypalEmail: data.paypalEmail,
-      paisId: Number(data.paisId),
-      cantonId: Number(data.cantonId) || null,
-      password: data.password,
-      roleId: 42
-    };
-
-    const [, error] = initialValues ? await to<AxiosResponse<any>>(AgroMarApi.patch(`/users/${initialValues.id}`, newUser)) : await to<AxiosResponse<any>>(AgroMarApi.post('/users/create', newUser));
-
-    if (error) return toast.error(error.message);
-
-    toast.success('Usuario creado exitosamente');
-
-    onSuccess?.();
-  }
+  });
 
   return (
     <Form {...form}>
@@ -347,15 +322,32 @@ const CreateOrUpdateUserForm = ({ onSuccess, initialValues, onCancel }: { onSucc
         </div>
 
         <div className="flex justify-between items-center">
-          <Button disabled={form.formState.isSubmitting} variant={'secondary'} onClick={onCancel}>
-            Cancelar
-          </Button>
+          {
+            isRegister ? (
+              <div className="flex justify-center flex-col mx-auto w-1/2"> 
+                <LoaderBtn isLoading={form.formState.isSubmitting} type="submit" disabled={form.formState.isSubmitting}>
+                  Registrarse
+                </LoaderBtn>
 
-          <LoaderBtn isLoading={form.formState.isSubmitting} type="submit" disabled={form.formState.isSubmitting}>
-            {
-              initialValues ? "Actualizar" : "Crear"
-            } Usuario
-          </LoaderBtn>
+                <div className="flex justify-center w-full items-center gap-2">
+                  <p className="text-center text-xs">Ya tienes una cuenta?</p>
+                  <Button variant={'link'} className="p-0 ml-1 font-bold text-xs" onClick={() => onToggleSignup(false)}>Inicia sesión</Button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <Button disabled={form.formState.isSubmitting} variant={'secondary'} onClick={onCancel} type="button">
+                  Cancelar
+                </Button>
+
+                <LoaderBtn isLoading={form.formState.isSubmitting} type="submit" disabled={form.formState.isSubmitting}>
+                  {
+                    initialValues ? "Actualizar" : "Crear"
+                  } Usuario
+                </LoaderBtn>
+              </>
+            )
+          }
         </div>
       </form>
     </Form>
