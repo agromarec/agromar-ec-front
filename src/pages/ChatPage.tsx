@@ -11,19 +11,20 @@ export const ChatPage = () => {
   const user = useAuthStore(state => state.user);
   const { on, emit } = useSocket({ url: 'http://localhost:3001/' });
   const loadChatUsers = useChatStore(state => state.loadChatUsers);
-  const sendMessage = useChatStore(state => state.sendMessage);
+  const createMessage = useChatStore(state => state.createMessage);
+  const onUserConnect = useChatStore(state => state.onUserConnect);
 
   useEffect(() => {
-    on('personal-message', (data: string) => {
-      console.log('Recibido:', data);
+    on('personal-message', (data: { from: number; to: number; message: string; date: Date }) => {
+      createMessage({ isMe: false, message: data.message });
     });
 
     // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
-    on('conection', (data: string) => {
-      console.log(`Usuario con id: ${data} se ha =>`, { data });
+    on('conection', (data: { userId: number; isOnline: boolean }) => {
+      onUserConnect(data);
     });
 
     // eslint-disable-next-line
@@ -38,12 +39,12 @@ export const ChatPage = () => {
 
   const onSubmit = (to: number, msg: string) => {
     if (!user) return;
-    sendMessage(msg);
-    // emit('personal-message', {
-    //   from: user.id,
-    //   to,
-    //   message: msg,
-    // });
+    emit('personal-message', {
+      from: user.id,
+      to,
+      message: msg,
+    });
+    createMessage({ isMe: true, message: msg });
   };
 
 
@@ -64,9 +65,14 @@ const ChatUsersView = () => {
 
   return (
     <div className="flex flex-col gap-2 basis-1/4 bg-gray-200 h-[calc(100dvh-3rem)]">
+
+      <div className="flex justify-between items-center p-2 border-b-2 border-gray-300">
+        <p className="text-md font-semibold">Usuarios conectados</p>
+      </div>
+
       {
         Object.values(chatUsers).map(user => (
-          <UserCard user={user} />
+          <UserCard key={user.id} user={user} />
         ))
       }
     </div>
