@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuSep
 import useAuthStore from "@/store/auht";
 import useCartStore from "@/store/cartStore";
 import { Roles } from "@/config/globalVariables";
+import { ValidRoutes } from "@/router";
 
 export const AppHeader = () => {
   const authStatus = useAuthStore(state => state.status);
@@ -69,14 +70,14 @@ export const PrivateOptions = () => {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent side="bottom" align="end">
-          <NavLink to={'/'}>
+          <NavLink to={ValidRoutes.PROFILE}>
             <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
               <User />
               <p>Perfil</p>
             </DropdownMenuItem>
           </NavLink>
 
-          <NavLink to={'/'}>
+          <NavLink to={ValidRoutes.CHAT}>
             <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
               <MessageSquare />
               <p>Conversaciones</p>
@@ -87,7 +88,7 @@ export const PrivateOptions = () => {
 
           {
             user?.user_role.some(role => role.roleId === Roles.ADMIN) ? (
-              <NavLink to={'/admin'}>
+              <NavLink to={ValidRoutes.ADMIN}>
                 <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
                   <Settings />
                   <p>Administración</p>
@@ -95,7 +96,7 @@ export const PrivateOptions = () => {
               </NavLink>
 
             ) : (
-              <NavLink to={'/admin/products'}>
+              <NavLink to={ValidRoutes.ADMIN_PRODUCTS}>
                 <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
                   <Store />
                   <p>Mis Productos</p>
@@ -105,14 +106,14 @@ export const PrivateOptions = () => {
           }
 
 
-          <NavLink to={'/cart'}>
+          <NavLink to={ValidRoutes.MY_ORDERS}>
             <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
               <ShoppingCart />
               <p>Mis Compras</p>
             </DropdownMenuItem>
           </NavLink>
 
-          <NavLink to={'/'}>
+          <NavLink to={ValidRoutes.MY_SALES}>
             <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
               <DollarSign />
               <p>Mis Ventas</p>
@@ -125,7 +126,7 @@ export const PrivateOptions = () => {
             className="flex items-center gap-2 hover:cursor-pointer text-rose-500 hover:!text-rose-500"
             onClick={() => {
               logout();
-              navigatge('/');
+              navigatge(ValidRoutes.HOME);
             }}>
             <LogOut />
             <p>Cerrar Sesión</p>

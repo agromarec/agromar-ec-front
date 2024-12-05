@@ -60,8 +60,8 @@ const useChatStore = create<ChatStore>()((set, get) => ({
       !state.chatingWith ? state :
         ({
           chatMessages: [
-            ...state.chatMessages,
             { isMe, message, createdAt: new Date(), id: Date.now() },
+            ...state.chatMessages,
           ],
         })
     );

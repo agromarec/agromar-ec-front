@@ -13,7 +13,7 @@ export const ChatMessages = () => {
 
   return (
     // <div className="flex gap-2 overflow-y-auto min-h-[calc(100dvh-12rem)] max-h-[calc(100dvh-12rem)] bg-blue-400">
-    <div className="flex gap-2 overflow-y-auto flex-1 flex-col p-4">
+    <div className="flex gap-2 overflow-y-auto flex-1 flex-col-reverse p-4 max-h-[calc(100dvh-14rem)] px-8">
       {
         chatMessages.map(chatMessage => (
           <div key={chatMessage.id} className={`

@@ -3,7 +3,7 @@ import { AdminPage } from "@/pages/admin";
 import { HomePage } from "@/pages/HomePage";
 import { ProductsPage } from "@/pages/ProductsPage";
 import { ProfilePage } from "@/pages/ProfilePage";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { PrivateRoute } from "./PrivateRoute";
 import { AdminProductsPage } from "@/pages/admin/products/AdminProductsPage";
 import { AdminCategoriesPage } from "@/pages/admin/categories";
@@ -12,6 +12,24 @@ import { AdminMeasurePage } from "@/pages/admin/AdminMeasurePage";
 import { AdminParentProductPage } from "@/pages/admin/AdminParentProductPage";
 import { CartPage } from "@/pages/CartPage";
 import { ChatPage } from "@/pages/ChatPage";
+import { MyOrdersPage } from "@/pages/MyOrdersPage";
+import { MySalesPage } from "@/pages/MySalesPage";
+
+export enum ValidRoutes {
+  HOME = '/',
+  PRODUCTS = '/productos',
+  PROFILE = '/usuario/perfil',
+  CART = '/cart',
+  CHAT = '/chat',
+  ADMIN = '/admin',
+  ADMIN_USERS = '/admin/users',
+  ADMIN_PRODUCTS = '/admin/products',
+  ADMIN_CATEGORIES = '/admin/categories',
+  ADMIN_UNITS = '/admin/units',
+  ADMIN_PREDEFINED_PRODUCTS = '/admin/predefined-products',
+  MY_ORDERS = '/usuario/mis-compras',
+  MY_SALES = '/usuario/mis-ventas',
+}
 
 export const router = createBrowserRouter([
   {
@@ -21,10 +39,6 @@ export const router = createBrowserRouter([
       {
         path: '/',
         element: <HomePage />,
-      },
-      {
-        path: 'usuario/perfil',
-        element: <ProfilePage />,
       },
       {
         path: 'productos',
@@ -37,6 +51,24 @@ export const router = createBrowserRouter([
           {
             path: '/cart',
             element: <CartPage />,
+          },
+        ]
+      },
+      {
+        path: 'usuario',
+        element: <PrivateRoute />,
+        children: [
+          {
+            path: 'perfil',
+            element: <ProfilePage />,
+          },
+          {
+            path: 'mis-ventas',
+            element: <MySalesPage />,
+          },
+          {
+            path: 'mis-compras',
+            element: <MyOrdersPage />,
           },
         ]
       },
@@ -82,4 +114,8 @@ export const router = createBrowserRouter([
       }
     ],
   },
+  {
+    path: '*',
+    element: <Navigate to={ValidRoutes.HOME} />,
+  }
 ]);

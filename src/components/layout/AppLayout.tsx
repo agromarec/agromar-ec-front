@@ -4,6 +4,7 @@ import { AuthModal } from "../auth/AuthModal";
 import { AppAlertDialog } from "../ui/AppAlertDialog";
 
 export const AppLayout = () => {
+
   return (
     <>
       <AppHeader />
@@ -11,8 +12,11 @@ export const AppLayout = () => {
         <Outlet />
       </div>
 
+      {
+        !window.location.pathname.includes('/chat') && <AppFooter />
+      }
+
       <AuthModal />
-      <AppFooter />
       <AppAlertDialog />
     </>
   )

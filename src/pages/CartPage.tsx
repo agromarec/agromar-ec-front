@@ -1,4 +1,5 @@
 import { CartButton } from "@/components/common/CartButton";
+import { Paypal } from "@/components/payment/Paypal";
 import { Button } from "@/components/ui/button";
 import { globalVariables } from "@/config/globalVariables";
 import { formatter } from "@/helpers";
@@ -64,7 +65,8 @@ export const CartPage = () => {
           </div>
 
 
-          <Button className="my-2">Finalizar pedido</Button>
+          {/* <Button className="my-2">Finalizar pedido</Button> */}
+          <Paypal />
 
           <Button variant={'outline'}>Ver Factura</Button>
         </div>
