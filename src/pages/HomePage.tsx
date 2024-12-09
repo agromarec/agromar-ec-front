@@ -19,9 +19,9 @@ export const HomePage = () => {
         </div>
       </div>
 
-      <div className="h-96">
+      {/* <div className="h-96">
         fjasfjsal
-      </div>
+      </div> */}
     </>
   )
 };

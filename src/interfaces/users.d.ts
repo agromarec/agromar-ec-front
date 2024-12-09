@@ -15,6 +15,7 @@ export interface IUserResponse {
   user_role: UserRole[];
   canton_ce: CantonCe;
   isOnline: boolean;
+  pais_ce: any;
 }
 
 export interface CantonCe {

@@ -13,8 +13,6 @@ function App() {
     // eslint-disable-next-line
   }, []);
 
-  console.log(import.meta.env.VITE_PAYPAL_CLIENT_ID);
-
   return (
     <>
       <RouterProvider router={router} />

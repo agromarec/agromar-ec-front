@@ -30,6 +30,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   createText?: string;
   onCreate?: () => void;
+  allowedPageSizes?: number[];
 }
 
 export function DataTable<TData, TValue>({
@@ -37,6 +38,7 @@ export function DataTable<TData, TValue>({
   data,
   createText,
   onCreate,
+  allowedPageSizes,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -59,6 +61,10 @@ export function DataTable<TData, TValue>({
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination: {
+        pageSize: allowedPageSizes ? allowedPageSizes[0] : 10,
+        pageIndex: 0,
+      },
     },
   })
 
@@ -69,10 +75,13 @@ export function DataTable<TData, TValue>({
           <FilterTableSection table={table} />
         </div>
 
-        <Button onClick={onCreate}>
-          {createText ?? 'Crear'}
-          <Plus />
-        </Button>
+        {
+          onCreate &&
+          <Button onClick={onCreate}>
+            {createText ?? 'Crear'}
+            <Plus />
+          </Button>
+        }
       </div>
 
       <div className="rounded-md border">
@@ -127,7 +136,7 @@ export function DataTable<TData, TValue>({
       </div>
 
       <div className="mt-4">
-        <DataTablePagination table={table} />
+        <DataTablePagination table={table} allowedPageSizes={allowedPageSizes} />
       </div>
     </>
   )

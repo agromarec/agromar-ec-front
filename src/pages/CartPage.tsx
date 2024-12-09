@@ -11,7 +11,7 @@ import { NavLink } from "react-router-dom";
 export const CartPage = () => {
   const cartItems = useCartStore(state => state.cartItems);
   const subtotal = useCartStore(state => state.subtotal);
-  const total = useCartStore(state => state.total);
+  const total = useCartStore(state => state.total);  
 
   if (Object.keys(cartItems).length === 0) return (
     <div className="container mx-auto pb-12">
@@ -58,7 +58,7 @@ export const CartPage = () => {
             <p className="text-end">{formatter({ value: subtotal })}</p>
 
             <p>IVA</p>
-            <p className="text-end">{formatter({ value: total * globalVariables.tax })}</p>
+            <p className="text-end">{formatter({ value: subtotal * globalVariables.tax })}</p>
 
             <p>Total</p>
             <p className="font-bold text-end">{formatter({ value: total })}</p>

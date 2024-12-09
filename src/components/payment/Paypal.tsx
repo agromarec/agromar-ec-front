@@ -1,17 +1,13 @@
-import { PayPalScriptProvider, PayPalButtons, ReactPayPalScriptOptions, usePayPalScriptReducer } from '@paypal/react-paypal-js';
+import { AgroMarApi } from '@/api/AgroMarApi';
+import { to } from '@/helpers';
+import useCartStore from '@/store/cartStore';
+import { PayPalScriptProvider, PayPalButtons, ReactPayPalScriptOptions, usePayPalScriptReducer, PayPalButtonsComponentProps } from '@paypal/react-paypal-js';
+import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 
 const initialOptions: ReactPayPalScriptOptions = {
   clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
   currency: 'USD',
-  // intent: 'authorize',
-  // commit: true,
-  // style: {
-  //   layout: 'vertical',
-  //   color: 'blue',
-  //   shape: 'rect',
-  //   label: 'paypal',
-  //   tagline: false,
-  // },
 };
 
 export const Paypal = () => {
@@ -26,6 +22,8 @@ export const Paypal = () => {
 
 
 export const PaypalActions = () => {
+  const navigate = useNavigate();
+  const emptyCart = useCartStore(state => state.emptyCart);
   const [{ isPending }] = usePayPalScriptReducer();
 
   if (isPending) return (
@@ -34,50 +32,46 @@ export const PaypalActions = () => {
     </div>
   )
 
-  function createOrder() {
-    return fetch("/my-server/create-paypal-order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      // use the "body" param to optionally pass additional order information
-      // like product ids and quantities
-      body: JSON.stringify({
-        cart: [
-          {
-            id: "YOUR_PRODUCT_ID",
-            quantity: "YOUR_PRODUCT_QUANTITY",
-          },
-        ],
-      }),
-    })
-      .then((response) => response.json())
-      .then((order) => order.id);
+  const createOrder: PayPalButtonsComponentProps['createOrder'] = async () => {
+    const [response, error] = await to(AgroMarApi.post('/payment', {
+      paypalClientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
+    }));
+
+    if (error) toast.error(error.message);
+
+    const transactionId = response?.data.transactionId;
+
+    return transactionId;
   }
 
 
-  function onApprove(data) {
-    return fetch("/my-server/capture-paypal-order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        orderID: data.orderID
-      })
-    })
-      .then((response) => response.json())
-      .then((orderData) => {
-        const name = orderData.payer.name.given_name;
-        alert(`Transaction completed by ${name}`);
-      });
+  const onApproveOrder: PayPalButtonsComponentProps['onApprove'] = async (data) => {
+    const [, error] = await to(AgroMarApi.post('/payment/approve', {
+      paypalClientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
+      transactionId: data.orderID,
+    }));
+    
+    if (error) toast.error(error.message);
+    else {
+      toast.success('Transacción aprobada');
+      emptyCart();
+      navigate('/usuario/mis-compras');
+    }
   }
+
+  const onCancelOrder: PayPalButtonsComponentProps['onCancel'] = async (data) => {
+    const [, error] = await to(AgroMarApi.delete(`/payment/${data.orderID}/`));
+
+    if (error) toast.error(error.message);
+
+    toast.success('Transacción cancelada');
+  }
+
   return (
     <PayPalButtons
       createOrder={createOrder}
-    // onApprove={(data) => {
-    //   data.
-    // }}
+      onApprove={onApproveOrder}
+      onCancel={onCancelOrder}
     />
   )
 };
