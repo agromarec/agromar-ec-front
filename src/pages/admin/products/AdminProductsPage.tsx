@@ -12,7 +12,7 @@ import { globalVariables, Roles } from "@/config/globalVariables";
 import useUiStore from "@/store/uiStore";
 import { toast } from "sonner";
 import { AgroMarApi } from "@/api/AgroMarApi";
-import useAuthStore from "@/store/auht";
+import useAuthStore from "@/store/authStore";
 
 export const AdminProductsPage = () => {
   const user = useAuthStore(state => state.user);

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom"
-import { DollarSign, Lock, LogOut, MessageSquare, Settings, ShoppingCart, Store, User } from "lucide-react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { DollarSign, Gavel, Handshake, Lock, LogOut, MessageSquare, Settings, ShoppingCart, Store, User } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuItem } from "./dropdown-menu";
-import useAuthStore from "@/store/auht";
+import useAuthStore from "@/store/authStore";
 import useCartStore from "@/store/cartStore";
 import { Roles } from "@/config/globalVariables";
 import { ValidRoutes } from "@/router";
@@ -19,6 +19,8 @@ export const AppHeader = () => {
         </Link>
         <Link to="/" className="hover:text-gray-200">Inicio</Link>
         <Link to="/productos" className="hover:text-gray-200">Productos</Link>
+        <Link to="/solicitudes" className="hover:text-gray-200">Solicitudes</Link>
+        <Link to="/solicitudes" className="hover:text-gray-200">Subastas</Link>
       </div>
 
       <div className="flex items-center gap-4 text-white pr-4">
@@ -32,8 +34,6 @@ export const AppHeader = () => {
             </div>
           )
         }
-
-
       </div>
 
     </div>
@@ -96,15 +96,30 @@ export const PrivateOptions = () => {
               </NavLink>
 
             ) : (
-              <NavLink to={ValidRoutes.ADMIN_PRODUCTS}>
-                <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
-                  <Store />
-                  <p>Mis Productos</p>
-                </DropdownMenuItem>
-              </NavLink>
+              <>
+                <NavLink to={ValidRoutes.ADMIN_PRODUCTS}>
+                  <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
+                    <Store />
+                    <p>Mis Productos</p>
+                  </DropdownMenuItem>
+                </NavLink>
+
+                <NavLink to={ValidRoutes.REQUESTS}>
+                  <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
+                    <Handshake />
+                    <p>Mis Solicitudes</p>
+                  </DropdownMenuItem>
+                </NavLink>
+
+                <NavLink to={ValidRoutes.REQUESTS}>
+                  <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
+                    <Gavel />
+                    <p>Mis Subastas</p>
+                  </DropdownMenuItem>
+                </NavLink>
+              </>
             )
           }
-
 
           <NavLink to={ValidRoutes.MY_ORDERS}>
             <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">

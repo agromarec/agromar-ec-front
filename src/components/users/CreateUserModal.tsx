@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Button } from "../ui/button";
 import { LoaderBtn } from "../ui/LoaderBtn";
 import CustomInput from "../ui/CustomInput";
-import useAuthStore from "@/store/auht";
+import useAuthStore from "@/store/authStore";
 
 interface CreateUserModalProps {
   isOpen: boolean;

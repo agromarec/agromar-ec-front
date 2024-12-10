@@ -2,7 +2,7 @@ import { RouterProvider } from 'react-router-dom'
 import { router } from './router'
 import { Toaster } from 'sonner';
 import { useEffect } from 'react';
-import useAuthStore from './store/auht';
+import useAuthStore from './store/authStore';
 
 
 function App() {

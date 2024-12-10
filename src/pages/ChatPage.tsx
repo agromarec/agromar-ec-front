@@ -5,7 +5,7 @@ import { CircleUser } from "lucide-react";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatMessages } from "@/components/chat/ChatMessages";
 import { ChatForm } from "@/components/chat/ChatForm";
-import useAuthStore from "@/store/auht";
+import useAuthStore from "@/store/authStore";
 
 export const ChatPage = () => {
   const user = useAuthStore(state => state.user);

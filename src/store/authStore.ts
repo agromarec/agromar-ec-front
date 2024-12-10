@@ -1,5 +1,4 @@
 import { AgroMarApi } from "@/api/AgroMarApi";
-import { Roles } from "@/config/globalVariables";
 import { to } from "@/helpers";
 import { IUserResponse } from "@/interfaces/users";
 import { toast } from "sonner";
@@ -81,14 +80,13 @@ const useAuthStore = create<AuthState>()((set) => ({
       paisId: Number(data.paisId),
       cantonId: Number(data.cantonId) || null,
       password: data.password,
-      roles: [
-        Roles.COMPRADOR,
-        Roles.VENDEDOR,
-      ]
+      // roles: [
+      //   Roles.COMPRADOR,
+      //   Roles.VENDEDOR,
+      // ]
     };
 
     const [response, error] = await to(AgroMarApi.post('/auth/signup', newUser));
-
 
     if (error) {
       set({ status: 'unauthenticated', error: error.message, isOpenModal: false });

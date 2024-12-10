@@ -1,4 +1,4 @@
-import useAuthStore from "@/store/auht";
+import useAuthStore from "@/store/authStore";
 import { Button } from "../ui/button";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import useCartStore from "@/store/cartStore";

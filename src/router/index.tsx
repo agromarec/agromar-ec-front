@@ -14,6 +14,7 @@ import { CartPage } from "@/pages/CartPage";
 import { ChatPage } from "@/pages/ChatPage";
 import { MyOrdersPage } from "@/pages/MyOrdersPage";
 import { MySalesPage } from "@/pages/MySalesPage";
+import { AdminRequestsPage } from "@/pages/admin/AdminRequestsPage";
 
 export enum ValidRoutes {
   HOME = '/',
@@ -23,10 +24,11 @@ export enum ValidRoutes {
   CHAT = '/chat',
   ADMIN = '/admin',
   ADMIN_USERS = '/admin/users',
-  ADMIN_PRODUCTS = '/admin/products',
   ADMIN_CATEGORIES = '/admin/categories',
   ADMIN_UNITS = '/admin/units',
   ADMIN_PREDEFINED_PRODUCTS = '/admin/predefined-products',
+  ADMIN_PRODUCTS = '/admin/products',
+  REQUESTS = '/admin/solicitudes',
   MY_ORDERS = '/usuario/mis-compras',
   MY_SALES = '/usuario/mis-ventas',
 }
@@ -97,6 +99,10 @@ export const router = createBrowserRouter([
           {
             path: '/admin/products',
             element: <AdminProductsPage />
+          },
+          {
+            path: '/admin/solicitudes',
+            element: <AdminRequestsPage />
           },
           {
             path: '/admin/categories',

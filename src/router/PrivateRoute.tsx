@@ -1,5 +1,5 @@
 import { Roles } from "@/config/globalVariables";
-import useAuthStore from "@/store/auht";
+import useAuthStore from "@/store/authStore";
 import { Outlet, useNavigate } from "react-router";
 import { toast } from "sonner";
 
@@ -16,7 +16,7 @@ export const PrivateRoute = () => {
 
   if (!user?.user_role.find(role => role.roleId === Roles.ADMIN) && window.location.pathname.includes('/admin')) {
     const path = window.location.pathname;
-    if (!path.includes('/products')) {
+    if (!path.includes('/products') && !path.includes('/solicitudes')) {
       navigate('/');
       toast.error('No tienes permisos para acceder a esta página');
       return <></>;

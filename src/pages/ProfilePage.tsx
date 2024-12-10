@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { LoaderBtn } from "@/components/ui/LoaderBtn";
 import { to } from "@/helpers";
 import { useDisclousure } from "@/hooks";
-import useAuthStore from "@/store/auht";
+import useAuthStore from "@/store/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";

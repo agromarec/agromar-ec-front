@@ -4,7 +4,7 @@ import { Textarea } from "../ui/textarea";
 import { formatter, to } from "@/helpers";
 import { Button } from "../ui/button";
 import { Send, Trash2 } from "lucide-react";
-import useAuthStore from "@/store/auht";
+import useAuthStore from "@/store/authStore";
 import { globalVariables } from "@/config/globalVariables";
 import { CartButton } from "../common/CartButton";
 import { useFetch } from "@/hooks";
