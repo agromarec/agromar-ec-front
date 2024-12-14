@@ -13,7 +13,9 @@ export const AppLayout = () => {
       </div>
 
       {
-        !window.location.pathname.includes('/chat') && <AppFooter />
+        !window.location.pathname.includes('/chat') &&
+        !window.location.pathname.includes('/')
+        && <AppFooter />
       }
 
       <AuthModal />
