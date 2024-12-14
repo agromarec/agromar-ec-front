@@ -9,7 +9,7 @@ export const PrivateRoute = () => {
   const navigate = useNavigate();
 
   if (authStatus === 'unauthenticated') {
-    navigate('/');
+    setTimeout(() => navigate('/'), 100);
     toast.error('No tienes permisos para acceder a esta página');
     return <></>;
   }

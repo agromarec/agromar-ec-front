@@ -35,3 +35,23 @@ export interface ProvinceCe {
 export interface UserRole {
   roleId: number;
 }
+
+
+
+export interface IUserSearch {
+  id: number;
+  name: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  pais_ce: PaisCe;
+}
+
+export interface PaisCe {
+  id_pais: number;
+  creation_date: Date;
+  name: string;
+  status: string;
+}
+

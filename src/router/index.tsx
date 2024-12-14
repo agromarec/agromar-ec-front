@@ -4,7 +4,7 @@ import { HomePage } from "@/pages/HomePage";
 import { ProductsPage } from "@/pages/ProductsPage";
 import { ProfilePage } from "@/pages/ProfilePage";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { PrivateRoute } from "./PrivateRoute";
+import { PrivateRoute } from './PrivateRoute';
 import { AdminProductsPage } from "@/pages/admin/products/AdminProductsPage";
 import { AdminCategoriesPage } from "@/pages/admin/categories";
 import { AdminUsersPage } from "@/pages/admin/AdminUsersPage";
@@ -15,6 +15,7 @@ import { ChatPage } from "@/pages/ChatPage";
 import { MyOrdersPage } from "@/pages/MyOrdersPage";
 import { MySalesPage } from "@/pages/MySalesPage";
 import { AdminRequestsPage } from "@/pages/admin/AdminRequestsPage";
+import { UsersSearchPage } from "@/pages/UsersSearchPage";
 
 export enum ValidRoutes {
   HOME = '/',
@@ -43,8 +44,24 @@ export const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
+        path: 'usuarios',
+        element: <PrivateRoute />,
+        children: [
+          {
+            path: '/usuarios/:userType',
+            element: <UsersSearchPage />,
+          },
+        ]
+      },
+      {
         path: 'productos',
-        element: <ProductsPage />,
+        element: <PrivateRoute />,
+        children: [
+          {
+            path: '/productos',
+            element: <ProductsPage />,
+          },
+        ]
       },
       {
         path: 'cart',
