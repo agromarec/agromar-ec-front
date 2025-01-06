@@ -68,8 +68,8 @@ export const HomePage = () => {
                       onClick: () => navigate('/usuarios/empresa')
                     },
                     {
-                      text: 'Necito realizar comercio electrónico con el govierno',
-                      onClick: () => navigate('/usuarios/govierno')
+                      text: 'Necito realizar comercio electrónico con el gobierno',
+                      onClick: () => navigate('/usuarios/gobierno')
                     }
                   ]}
                   onClick={() => fullpageApi.moveSectionDown()}
@@ -78,11 +78,11 @@ export const HomePage = () => {
 
               <div className="section">
                 <Section
-                  title='Goviernos'
+                  title='Gobiernos'
                   data={[
                     {
-                      text: 'Busco productos Agrícolas y Acuícolas de otros Goviernos',
-                      onClick: () => navigate('/usuarios/govierno')
+                      text: 'Busco productos Agrícolas y Acuícolas de otros Gobierno',
+                      onClick: () => navigate('/usuarios/gobierno')
                     },
                     {
                       text: 'Busco realizar comercios electrónicos con empresas y negocios',

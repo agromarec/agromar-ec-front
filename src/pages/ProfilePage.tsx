@@ -1,14 +1,18 @@
 import { AgroMarApi } from "@/api/AgroMarApi";
 import { Button } from "@/components/ui/button";
+import { CustomDialog } from "@/components/ui/CustomDialog";
 import CustomInput from "@/components/ui/CustomInput";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input";
 import { LoaderBtn } from "@/components/ui/LoaderBtn";
+import { Textarea } from "@/components/ui/textarea";
 import { to } from "@/helpers";
 import { useDisclousure } from "@/hooks";
 import useAuthStore from "@/store/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -16,8 +20,9 @@ import { z } from "zod";
 
 export const ProfilePage = () => {
   const user = useAuthStore(state => state.user);
-  const { isOpen, toggleDisclosure } = useDisclousure();
-
+  const checkAuth = useAuthStore(state => state.checkAuth);
+  const { isOpen, toggleDisclosure: tooglePasswordModal } = useDisclousure();
+  const { isOpen: isOpenPayment, toggleDisclosure: tooglePaymentModal } = useDisclousure();
 
   return (
     <div className="container mx-auto my-12 px-12">
@@ -28,7 +33,7 @@ export const ProfilePage = () => {
         <div className="flex flex-col w-full max-w-sm">
           <img
             src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" alt="perfil"
-            className="w-full h-full rounded-lg max-w-72 mx-auto"
+            className="w-full h-full rounded-lg max-w-72 mx-auto max-h-96"
           />
 
           <div className="text-center">
@@ -119,13 +124,35 @@ export const ProfilePage = () => {
             </label>
           </div>
 
-          <Button className="mt-4 max-w-sm mx-auto" onClick={toggleDisclosure}>Cambiar contraseña</Button>
+          <div className="flex gap-4 justify-center mx-auto">
+            <Button className="mt-4 max-w-sm mx-auto" onClick={tooglePasswordModal}>Cambiar contraseña</Button>
+            <Button variant="secondary" className="mt-4 max-w-sm mx-auto" onClick={tooglePaymentModal}>Ver métodos de pago</Button>
+          </div>
+
+
+          <SellerDescriptionFrom initialDescription={user?.businessDescription} />
         </div>
       </div>
 
+
       <ChangePasswordModal
         isOpen={isOpen}
-        onClose={toggleDisclosure}
+        onClose={tooglePasswordModal}
+      />
+
+      <CustomDialog
+        isOpen={isOpenPayment}
+        onOpenChange={tooglePaymentModal}
+        title="Métodos de pago"
+        content={() =>
+          <PaymentMethodsForm
+            initialValues={{ allowBankTransfers: !!user?.allowBankTransfers, allowPaypalPayments: !!user?.allowPaypalPayments, bankTransfersInfo: user?.bankTransfersInfo || '' }}
+            onSuccess={() => {
+              tooglePaymentModal()
+              checkAuth();
+            }}
+          />
+        }
       />
     </div>
   )
@@ -229,3 +256,144 @@ const ChangePasswordModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: ()
     </Dialog>
   )
 };
+
+export const SellerDescriptionFrom = ({ initialDescription }: { initialDescription?: string | null }) => {
+  const [description, setDescription] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    setDescription(initialDescription ?? '');
+  }, [initialDescription]);
+
+  return (
+    <div>
+      <h2 className="text-center text-2xl font-bold mt-10 mb-4">Descripción del vendedor</h2>
+
+      <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Descripción del vendedor"
+        className="resize-none w-full h-20 rounded-lg border-2 border-gray-300"
+      />
+
+      <LoaderBtn
+        className="mt-4 max-w-sm mx-auto"
+        isLoading={isLoading}
+        onClick={async () => {
+          setIsLoading(true);
+          const [, error] = await to(AgroMarApi.post('/users/seller/update-description', {
+            description,
+          }));
+          setIsLoading(false);
+
+          if (error) return toast.error(error.message);
+          toast.success('Descripción actualizada exitosamente');
+        }}
+      >Cambiar descripción</LoaderBtn>
+    </div>
+  )
+};
+
+
+
+const FormSchema = z.object({
+  allowPaypalPayments: z.boolean().default(false),
+  allowBankTransfers: z.boolean().default(false),
+  bankTransfersInfo: z.string().optional(),
+}).refine(data => !!data.bankTransfersInfo, {
+  message: "La información de transferencia es obligatoria",
+  path: ["bankTransfersInfo"],
+});
+
+export function PaymentMethodsForm({ initialValues, onSuccess }: { initialValues?: z.infer<typeof FormSchema>; onSuccess?: () => void }) {
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: initialValues ? initialValues : {
+      allowPaypalPayments: false,
+      allowBankTransfers: false,
+      bankTransfersInfo: "",
+    },
+  })
+
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    const [, error] = await to(AgroMarApi.post('auth/update-payment-methods', {
+      ...data
+    }));
+
+    if (error) return toast.error(error.message);
+
+    toast.success('Contraseña cambiada exitosamente');
+    form.reset();
+    onSuccess?.();
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+        <div>
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="allowPaypalPayments"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                  <div className="space-y-0.5">
+                    <FormLabel>Paypal</FormLabel>
+                    <FormDescription>
+                      Recive los pagos de tus productos por Paypal o por tarjeta de crédito/débito.
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="allowBankTransfers"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                  <div className="space-y-0.5">
+                    <FormLabel>Transferencias</FormLabel>
+                    <FormDescription>
+                      Recibe el pago de tus productos por transferencia bancaria.
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      aria-readonly
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            {
+              form.watch('allowBankTransfers') &&
+              <FormField
+                control={form.control}
+                name="bankTransfersInfo"
+                render={({ field }) => (
+                  <FormItem className="mx-auto">
+                    <FormLabel>Información de transferencia</FormLabel>
+                    <FormControl>
+                      <Textarea value={field.value} onChange={e => field.onChange(e.target.value)} placeholder="Información de transferencia"
+                        className="resize-none h-32 rounded-lg border-2 border-gray-300" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            }
+          </div>
+        </div>
+
+        <Button type="submit" className="mx-auto block">Cambiar métodos de pago</Button>
+      </form>
+    </Form>
+  )
+}

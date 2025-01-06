@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { CartButton } from "@/components/common/CartButton";
 import { Paypal } from "@/components/payment/Paypal";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,12 @@ import { NavLink } from "react-router-dom";
 export const CartPage = () => {
   const cartItems = useCartStore(state => state.cartItems);
   const subtotal = useCartStore(state => state.subtotal);
-  const total = useCartStore(state => state.total);  
+  const total = useCartStore(state => state.total);
+
+  const sellerInfo = useMemo(() => {
+    return cartItems[(Object.keys(cartItems)[0] as any)]?.user_ce as any;
+  }, [cartItems]);
+
 
   if (Object.keys(cartItems).length === 0) return (
     <div className="container mx-auto pb-12">
@@ -27,7 +33,7 @@ export const CartPage = () => {
         </NavLink>
       </div>
     </div>
-  )
+  );
 
   return (
     <div className="container mx-auto pb-12">
@@ -66,9 +72,44 @@ export const CartPage = () => {
 
 
           {/* <Button className="my-2">Finalizar pedido</Button> */}
-          <Paypal />
+          {
+            sellerInfo.allowBankTransfers &&
+            <>
+              <p className="font-bold text-xl">Transferencia bancaria</p>
+              <div className="
+                    grid
+                    text-sm
+                    after:px-3.5
+                    after:py-2.5
+                    [&>textarea]:text-inherit
+                    after:text-inherit
+                    [&>textarea]:resize-none
+                    [&>textarea]:[grid-area:1/1/2/2]
+                    after:[grid-area:1/1/2/2]
+                    after:whitespace-pre-wrap
+                    after:invisible
+                    after:content-[attr(data-cloned-val)_'_']
+                    after:border
+                    overflow-auto
+                ">
+              <textarea
+                  className="w-full text-slate-600 bg-slate-100 border border-transparent hover:border-slate-200 appearance-none rounded-md px-3.5 py-2.5 outline-none focus:bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 h-full min-h-40 text-lg overflow-auto cursor-default"
+                  name="message"
+                  id="message"
+                  readOnly
+                  value={sellerInfo.bankTransfersInfo}
+                ></textarea>
+              </div>
+            </>
+          }
 
-          <Button variant={'outline'}>Ver Factura</Button>
+          {
+            sellerInfo?.allowPaypalPayments &&
+            <Paypal />
+          }
+
+
+          <Button variant={'outline'}>Solicitar cotización</Button>
         </div>
       </div>
     </div>

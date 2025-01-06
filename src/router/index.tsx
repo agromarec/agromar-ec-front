@@ -19,7 +19,7 @@ import { UsersSearchPage } from "@/pages/UsersSearchPage";
 
 export enum ValidRoutes {
   HOME = '/',
-  PRODUCTS = '/productos',
+  // PRODUCTS = '/productos',
   PROFILE = '/usuario/perfil',
   CART = '/cart',
   CHAT = '/chat',
@@ -58,9 +58,13 @@ export const router = createBrowserRouter([
         element: <PrivateRoute />,
         children: [
           {
-            path: '/productos',
+            path: '/productos/:userId',
             element: <ProductsPage />,
           },
+          {
+            path: '/productos',
+            element: <Navigate to={ValidRoutes.HOME} />,
+          }
         ]
       },
       {

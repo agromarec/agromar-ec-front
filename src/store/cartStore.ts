@@ -10,6 +10,7 @@ import { create } from "zustand";
 interface CartStore {
   cartId: number | null;
   cartItems: Record<number, IProduct & { quantity: number }>;
+  isLoadingCart: boolean;
   count: number;
   tax: number;
   subtotal: number;
@@ -29,6 +30,7 @@ const useCartStore = create<CartStore>()((set, get) => ({
   total: 0,
   count: 0,
   cartId: null,
+  isLoadingCart: false,
 
   loadCart: async () => {
     const [response, error] = await to<AxiosResponse<ICartResponse>>(AgroMarApi.get('/cart'));
@@ -60,7 +62,7 @@ const useCartStore = create<CartStore>()((set, get) => ({
   },
 
   addToCart: async (product, quantity) => {
-    const [, error] = await to<AxiosResponse<ICartResponse>>(AgroMarApi.patch('/cart', {
+    const [data, error] = await to<AxiosResponse<ICartResponse>>(AgroMarApi.patch('/cart', {
       productId: product.id,
       quantity,
     }));
@@ -95,6 +97,7 @@ const useCartStore = create<CartStore>()((set, get) => ({
         subtotal,
         total,
         count: Object.keys(cartItems).length,
+        cartId: data.data.id_shopping_cart
       }
     });
 
@@ -112,7 +115,20 @@ const useCartStore = create<CartStore>()((set, get) => ({
   },
 
   emptyCartAsync: async () => {
+    set(state => ({
+      ...state,
+      isLoadingCart: true,
+    }))
+
     const cartId = get().cartId;
+    if (!cartId) {
+      set(state => ({
+        ...state,
+        isLoadingCart: false,
+      }));
+      return;
+    }
+
     const [, error] = await to(AgroMarApi.delete(`/cart/${cartId}`));
     if (error) {
       toast.error(error.message);
@@ -121,10 +137,12 @@ const useCartStore = create<CartStore>()((set, get) => ({
 
     set(() => ({
       cartItems: {},
+      cartId: null,
       count: 0,
       subtotal: 0,
       total: 0,
       tax: 0.15,
+      isLoadingCart: false
     }));
 
     toast.success('Carrito vaciado');

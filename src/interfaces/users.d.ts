@@ -16,6 +16,10 @@ export interface IUserResponse {
   canton_ce: CantonCe;
   isOnline: boolean;
   pais_ce: any;
+  allowPaypalPayments: boolean;
+  allowBankTransfers: boolean;
+  bankTransfersInfo: string | null;
+  businessDescription: string | null;
 }
 
 export interface CantonCe {
@@ -46,6 +50,7 @@ export interface IUserSearch {
   phone: string;
   address: string;
   pais_ce: PaisCe;
+  businessDescription: string;
 }
 
 export interface PaisCe {

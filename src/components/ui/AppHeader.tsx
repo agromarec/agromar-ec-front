@@ -18,9 +18,9 @@ export const AppHeader = () => {
           <h1 className="text-xl font-bold">AgroMarEC</h1>
         </Link>
         <Link to="/" className="hover:text-gray-200">Inicio</Link>
-        <Link to="/productos" className="hover:text-gray-200">Productos</Link>
+        {/* <Link to="/productos" className="hover:text-gray-200">Productos</Link>
         <Link to="/solicitudes" className="hover:text-gray-200">Solicitudes</Link>
-        <Link to="/solicitudes" className="hover:text-gray-200">Subastas</Link>
+        <Link to="/solicitudes" className="hover:text-gray-200">Subastas</Link> */}
       </div>
 
       <div className="flex items-center gap-4 text-white pr-4">
