@@ -45,6 +45,7 @@ const userSchema = (isUpdating: boolean) => z.object({
   paisId: z.string().min(1, "El pais es requerido"),
   provinceId: z.string().min(1, "La provincia es requerida"),
   cantonId: z.string().min(1, "El cantón es requerido"),
+  userType: z.string().min(1, "El tipo de usuario es requerido"),
   password: isUpdating
     ? z.string().optional()
     : z.string({ required_error: "La contraseña es requerida" }).min(8, "Debe tener al menos 8 caracteres"),
@@ -59,9 +60,6 @@ export const CreateOrUpdateUserForm = ({ onSubmit, initialValues, onCancel, isRe
   const { data: cantones } = useFetch<ICantonResponse[]>('/cantones');
   const onToggleSignup = useAuthStore(state => state.onToggleSignup);
 
-  console.log({initialValues});
-  
-
   const form = useForm({
     defaultValues: initialValues ? ({
       name: initialValues.name,
@@ -73,6 +71,7 @@ export const CreateOrUpdateUserForm = ({ onSubmit, initialValues, onCancel, isRe
       paisId: initialValues?.paisId.toString(),
       cantonId: (initialValues?.canton_ce?.id || '')?.toString(),
       provinceId: initialValues.canton_ce?.province_ce?.id_province?.toString(),
+      userType: initialValues.userType || '',
       // password: '',
       // confirmPassword: '',
     }) : {
@@ -87,6 +86,7 @@ export const CreateOrUpdateUserForm = ({ onSubmit, initialValues, onCancel, isRe
       cantonId: '',
       password: '',
       confirmPassword: '',
+      userType: '',
     },
     resolver: zodResolver(userSchema(!!initialValues)),
   });
@@ -95,6 +95,37 @@ export const CreateOrUpdateUserForm = ({ onSubmit, initialValues, onCancel, isRe
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-4 w-full">
         <div className="grid grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="userType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tipo de usuario</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={'Seleccione su tipo de usuario'} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value={'EMPRESA'}>
+                      EMPRESA
+                    </SelectItem>
+
+                    <SelectItem value={'CLIENTE'}>
+                      CLIENTE
+                    </SelectItem>
+
+                    <SelectItem value={'GOBIERNO'}>
+                      GOBIERNO
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="name"
@@ -327,7 +358,7 @@ export const CreateOrUpdateUserForm = ({ onSubmit, initialValues, onCancel, isRe
         <div className="flex justify-between items-center">
           {
             isRegister ? (
-              <div className="flex justify-center flex-col mx-auto w-1/2"> 
+              <div className="flex justify-center flex-col mx-auto w-1/2">
                 <LoaderBtn isLoading={form.formState.isSubmitting} type="submit" disabled={form.formState.isSubmitting}>
                   Registrarse
                 </LoaderBtn>

@@ -28,7 +28,7 @@ export const AuthModal = () => {
     <Dialog open={isOpenAuthModal} onOpenChange={onCloseAuthModal}>
       <DialogContent className={isSigningUp ? "max-w-[800px]" : undefined}>
         <DialogHeader>
-          <DialogTitle>Iniciar Sesión</DialogTitle>
+          <DialogTitle>{isSigningUp ? 'Regístrate' : 'Iniciar Sesión'}</DialogTitle>
           <DialogDescription>
             <AuthForm />
           </DialogDescription>

@@ -5,12 +5,13 @@ interface Props {
   title?: JSX.Element | string;
   content?: JSX.Element | string | (() => JSX.Element);
   onOpenChange: (isOpen: boolean) => void;
+  className?: string;
 }
 
-export const CustomDialog = ({ isOpen, onOpenChange, title, content }: Props) => {
+export const CustomDialog = ({ isOpen, onOpenChange, title, content, className }: Props) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className={className}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>

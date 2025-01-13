@@ -9,7 +9,7 @@ import { toast } from "sonner";
 export const ProductsPage = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const { data, loading, error } = useFetch<IProductResponse>(`/products/seller/${userId}`);
+  const { data, loading, error, refetch } = useFetch<IProductResponse>(`/products/seller/${userId}`);
 
   if (loading) {
     return (
@@ -23,11 +23,23 @@ export const ProductsPage = () => {
     return <></>
   }
 
+  const handleNextPage = async (page: number) => {
+    refetch(`/products/seller/${userId}?page=${page}`);
+  }
+
+  const handlePreviousPage = async (page: number) => {
+    refetch(`/products/seller/${userId}?page=${page}`);
+  }
+
   return (
     <div>
       {
         !!data &&
-        <ProductList data={data} />
+        <ProductList 
+          data={data} 
+          onNext={handleNextPage}
+          onPrevious={handlePreviousPage}
+        />
       }
     </div>
   )

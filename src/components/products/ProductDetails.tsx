@@ -38,7 +38,7 @@ export const ProductDetails = ({ isOpen, onClose, product }: ProductDetailsProps
 
             <div className="flex gap-4 h-full py-12">
               {/* <div className="my-auto"> */}
-              <img src={globalVariables.fileUrl + product.image} alt={product.predefinedProduct.name} width={400} className="object-cover rounded-lg h-[280px] my-auto" />
+              <img src={!product.image ? '/no-image.png' : `${globalVariables.fileUrl}${product.image}`} alt={product.predefinedProduct.name} width={400} className="object-cover rounded-lg h-[280px] my-auto" />
               {/* </div> */}
 
               <DialogDescription className="flex h-full text-black w-full gap-4">
@@ -135,9 +135,9 @@ export const CommentsForm = ({ productId }: { productId: number }) => {
       />
 
       <LoaderBtn
-        // variant=""
         isLoading={loading}
         onClick={async () => {
+          if(comment.trim().length === 0) return toast.error('El comentario no puede estar vacío');
           if (authStatus === 'unauthenticated') return onOpenLoginModal();
           setLoading(true);
           const [, error] = await to(AgroMarApi.post('/comments', { product_id: productId, comentario: comment }));

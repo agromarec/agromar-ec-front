@@ -80,6 +80,7 @@ const useAuthStore = create<AuthState>()((set) => ({
       paisId: Number(data.paisId),
       cantonId: Number(data.cantonId) || null,
       password: data.password,
+      userType: data.userType,
       // roles: [
       //   Roles.COMPRADOR,
       //   Roles.VENDEDOR,

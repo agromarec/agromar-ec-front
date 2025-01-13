@@ -1,18 +1,26 @@
-import { useMemo } from "react";
+import { useMemo, useState } from 'react';
 import { CartButton } from "@/components/common/CartButton";
 import { Paypal } from "@/components/payment/Paypal";
 import { Button } from "@/components/ui/button";
 import { globalVariables } from "@/config/globalVariables";
-import { formatter } from "@/helpers";
+import { formatter, to } from "@/helpers";
 import { IProduct } from "@/interfaces/products";
 import useCartStore from "@/store/cartStore";
 import { NavLink } from "react-router-dom";
+import { AgroMarApi } from "@/api/AgroMarApi";
+import { toast } from "sonner";
+import { CustomDialog } from "@/components/ui/CustomDialog";
+import { useNavigate } from 'react-router';
+import { QuoteButton } from '@/components/Quote';
 
 
 export const CartPage = () => {
   const cartItems = useCartStore(state => state.cartItems);
+  const emptyCartAsync = useCartStore(state => state.emptyCartAsync);
   const subtotal = useCartStore(state => state.subtotal);
   const total = useCartStore(state => state.total);
+  const [transferModal, setTransferModal] = useState(false);
+  const navigate = useNavigate();
 
   const sellerInfo = useMemo(() => {
     return cartItems[(Object.keys(cartItems)[0] as any)]?.user_ce as any;
@@ -100,6 +108,10 @@ export const CartPage = () => {
                   value={sellerInfo.bankTransfersInfo}
                 ></textarea>
               </div>
+
+              <Button
+                onClick={() => setTransferModal(true)}
+              >Realizar transferencia</Button>
             </>
           }
 
@@ -109,20 +121,52 @@ export const CartPage = () => {
           }
 
 
-          <Button variant={'outline'}>Solicitar cotización</Button>
+          <QuoteButton />
         </div>
       </div>
+
+      <CustomDialog 
+        isOpen={transferModal}
+        onOpenChange={setTransferModal}
+        title="Transferencia bancaria"
+        content={() => (
+          <div>
+            <p className='my-4'>
+              Tenga en cuenta que debe realizar la transferencia a una de las cuentas presentes. Tenga en cuenta que este proceso puedo tardar hasta 3 días en completarse. Una vez se confirme su transferencia, un agente se pondrá en contacto con usted para coordinar el lugar de entrega.
+            </p>
+
+            <div className="flex flex-col gap-4 w-full">
+              <Button className="my-2"
+                onClick={async () => {
+                  const [, error] = await to(AgroMarApi.post('/payment/bank-transfer', {
+                    amount: sellerInfo.bankTransfersInfo,
+                    paypalEmail: sellerInfo.paypalEmail,
+                  }));
+
+                  if(error) return toast.error(error.message);
+                  toast.success('Transferencia realizada exitosamente');
+                  emptyCartAsync();
+                  navigate('/usuario/mis-compras');
+                }}
+              >Finalizar pedido</Button>
+            </div>
+          </div>
+        )}
+      />
     </div>
   )
 };
 
 const CartItem = ({ cartItem }: { cartItem: IProduct & { quantity: number } }) => {
+
   return (
     <div>
       <div className="flex gap-4 mt-2">
-        <img src={globalVariables.fileUrl + cartItem.image} alt={cartItem.description} width={200} height={140} className="object-cover rounded-lg my-auto max-h-200" />
+        <img src={!cartItem.image ? '/no-image.png' : `${globalVariables.fileUrl}${cartItem.image}`} alt={cartItem.description} width={200} height={140} className="object-cover rounded-lg my-auto max-h-200" />
         <div className="flex flex-col gap-2 w-full">
-          <p className="text-sm font-bold">{cartItem.description}</p>
+          <p className="text-lg font-bold">{cartItem?.predefinedProduct?.name}</p>
+
+          <p>{cartItem.description}</p>
 
           <div className="flex gap-4 items-center">
             <p className="font-bold">Precio Unitario:</p>

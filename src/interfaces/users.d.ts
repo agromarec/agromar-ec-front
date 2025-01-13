@@ -20,6 +20,8 @@ export interface IUserResponse {
   allowBankTransfers: boolean;
   bankTransfersInfo: string | null;
   businessDescription: string | null;
+  userType: 'CLIENTE' | 'EMPRESA' | 'GOBIERNO';
+  profilePicture: string | null;
 }
 
 export interface CantonCe {

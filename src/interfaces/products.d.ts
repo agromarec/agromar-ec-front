@@ -3,6 +3,14 @@ export interface IProductResponse {
   currentPage: number;
   hasMore: boolean;
   products: IProduct[];
+  sellerInfo: SellerInfo;
+}
+
+interface SellerInfo {
+  id: number;
+  name: string;
+  email: string;
+  profilePicture?: string | null;
 }
 
 export interface IProduct {

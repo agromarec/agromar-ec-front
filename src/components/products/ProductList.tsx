@@ -3,13 +3,15 @@ import { Button } from "../ui/button";
 import { CardProduct } from './CardProduct';
 import { useDisclousure } from "@/hooks";
 import { ProductDetails } from "./ProductDetails";
-import { useRef } from "react";
+import { useRef } from 'react';
 
 interface ProductListProps {
   data: IProductResponse;
+  onNext: (pageNumber: number) => Promise<void>;
+  onPrevious: (pageNumber: number) => Promise<void>;
 }
 
-export const ProductList = ({ data }: ProductListProps) => {
+export const ProductList = ({ data, onNext, onPrevious }: ProductListProps) => {
   const { isOpen, toggleDisclosure } = useDisclousure();
   const productRef = useRef<IProduct|null>(null);
 
@@ -18,13 +20,13 @@ export const ProductList = ({ data }: ProductListProps) => {
       <h1 className="text-4xl font-bold text-center mt-16 after:bg-[#84E3F0] after:w-20 after:h-1 after:block after:mx-auto after:mt-2 after:content-['']">Productos</h1>
 
       <div className="flex flex-wrap justify-center gap-12 items-center mt-4">
-        <Button variant="default" disabled={data.currentPage === 1}>
+        <Button variant="default" disabled={data.currentPage === 1} onClick={() => onPrevious(data.currentPage - 1)}>
           Anterior
         </Button>
 
         <p>Página {data.currentPage} de {data.totalPages}</p>
 
-        <Button variant="default" disabled={!data.hasMore}>
+        <Button variant="default" disabled={!data.hasMore} onClick={() => onNext(data.currentPage + 1)}>
           Siguiente
         </Button>
       </div>

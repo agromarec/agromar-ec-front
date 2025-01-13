@@ -12,10 +12,12 @@ import { to } from "@/helpers";
 import { useDisclousure } from "@/hooks";
 import useAuthStore from "@/store/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Pencil } from "lucide-react";
+import { globalVariables } from "@/config/globalVariables";
 
 
 export const ProfilePage = () => {
@@ -23,18 +25,45 @@ export const ProfilePage = () => {
   const checkAuth = useAuthStore(state => state.checkAuth);
   const { isOpen, toggleDisclosure: tooglePasswordModal } = useDisclousure();
   const { isOpen: isOpenPayment, toggleDisclosure: tooglePaymentModal } = useDisclousure();
+  const filePicRef = useRef<HTMLInputElement>(null);
+
+  const handleChangProfilePic = async (e: any) => {
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    await AgroMarApi.patch(`/users/profile-pic/${user?.id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
 
   return (
     <div className="container mx-auto my-12 px-12">
       <h1 className="text-center text-2xl font-bold mt-20 mb-4">Bienvenido a tu perfil, {user?.name} {user?.lastName}</h1>
 
+      <input type="file" ref={filePicRef} className="hidden"
+        onChange={handleChangProfilePic}
+      />
+
       <div className="flex justify-start gap-10 w-full">
 
-        <div className="flex flex-col w-full max-w-sm">
+        <div className="flex flex-col w-full max-w-sm relative">
           <img
-            src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" alt="perfil"
-            className="w-full h-full rounded-lg max-w-72 mx-auto max-h-96"
+            src={
+              user?.profilePicture ? `${globalVariables.fileUrl}profile-pictures/${user.profilePicture}` : 'https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg'
+            }
+            alt="perfil"
+            className="rounded-lg mx-auto aspect-square h-[20rem] object-cover" 
           />
+
+          <p
+            className="text-center text-sm mt-4 mb-4 flex justify-center font-semibold cursor-pointer hover:bg-gray-200 rounded-lg max-w-fit mx-auto items-center px-2 py-2"
+            onClick={() => filePicRef.current?.click()}
+          >Editar foto de perfil
+            <Pencil height={20} width={20} className="ml-2" />
+          </p>
 
           <div className="text-center">
             <p className="text-sm font-bold">{user?.name} {user?.lastName}</p>

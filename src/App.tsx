@@ -7,11 +7,14 @@ import useAuthStore from './store/authStore';
 
 function App() {
   const checkAuth =  useAuthStore(state => state.checkAuth); 
+  const sesionStatus = useAuthStore(state => state.status);
   
   useEffect(() => {
     checkAuth();
     // eslint-disable-next-line
   }, []);
+
+  if(sesionStatus === 'loading') return <></>;
 
   return (
     <>

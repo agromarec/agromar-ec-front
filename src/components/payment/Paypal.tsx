@@ -68,10 +68,12 @@ export const PaypalActions = () => {
   }
 
   return (
-    <PayPalButtons
-      createOrder={createOrder}
-      onApprove={onApproveOrder}
-      onCancel={onCancelOrder}
-    />
+    <div className='z-0'>
+      <PayPalButtons
+        createOrder={createOrder}
+        onApprove={onApproveOrder}
+        onCancel={onCancelOrder}
+      />
+    </div>
   )
 };
