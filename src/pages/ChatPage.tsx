@@ -9,7 +9,8 @@ import useAuthStore from "@/store/authStore";
 
 export const ChatPage = () => {
   const user = useAuthStore(state => state.user);
-  const { on, emit } = useSocket({ url: 'http://localhost:3001/' });
+  // const { on, emit } = useSocket({ url: 'http://localhost:3001/' });
+  const { on, emit } = useSocket({ url: 'https://agromar-ec.vercel.app/' });
   const loadChatUsers = useChatStore(state => state.loadChatUsers);
   const createMessage = useChatStore(state => state.createMessage);
   const onUserConnect = useChatStore(state => state.onUserConnect);

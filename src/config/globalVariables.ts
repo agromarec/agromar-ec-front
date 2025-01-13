@@ -1,5 +1,6 @@
 export const globalVariables = {
-  fileUrl: 'http://localhost:3001/api/file/',
+  // fileUrl: 'http://localhost:3001/api/file/',
+  fileUrl: 'https://agromar-ec.vercel.app/api/file/',
   tax: 0.15,
 };
 
