@@ -128,6 +128,7 @@ export const AdminUsersPage = () => {
         header: () => <div className="text-center">Acciones</div>,
         cell: ({ row }) => {
           const rowData = row.original;
+          
           return (
             <ol className="flex items-center space-x-2 text-center justify-center">
               <li>

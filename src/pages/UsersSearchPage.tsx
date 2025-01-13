@@ -68,6 +68,9 @@ export const UsersSearchPage = () => {
           onChange={({ target }) => setSearchValue(target.value)}
           value={searchValue}
         />
+        <span className="text-gray-500 text-sm pl-4 block mt-1">
+          También puedes buscar empresas y clientes por nombres de productos
+        </span>
       </div>
 
       <Spinner isLoading={loading} />

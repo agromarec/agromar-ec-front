@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 const initialOptions: ReactPayPalScriptOptions = {
   clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
-  currency: 'USD',
+  currency: 'USD'
 };
 
 export const Paypal = () => {
@@ -50,7 +50,7 @@ export const PaypalActions = () => {
       paypalClientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
       transactionId: data.orderID,
     }));
-    
+
     if (error) toast.error(error.message);
     else {
       toast.success('Transacción aprobada');

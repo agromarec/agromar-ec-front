@@ -59,6 +59,9 @@ export const CreateOrUpdateUserForm = ({ onSubmit, initialValues, onCancel, isRe
   const { data: cantones } = useFetch<ICantonResponse[]>('/cantones');
   const onToggleSignup = useAuthStore(state => state.onToggleSignup);
 
+  console.log({initialValues});
+  
+
   const form = useForm({
     defaultValues: initialValues ? ({
       name: initialValues.name,
@@ -67,9 +70,9 @@ export const CreateOrUpdateUserForm = ({ onSubmit, initialValues, onCancel, isRe
       phone: initialValues.phone,
       address: initialValues.address,
       paypalEmail: initialValues.paypalEmail || '',
-      paisId: initialValues.paisId.toString(),
-      cantonId: (initialValues.canton_ce.id || '').toString(),
-      provinceId: initialValues.canton_ce.province_ce.id_province.toString(),
+      paisId: initialValues?.paisId.toString(),
+      cantonId: (initialValues?.canton_ce?.id || '')?.toString(),
+      provinceId: initialValues.canton_ce?.province_ce?.id_province?.toString(),
       // password: '',
       // confirmPassword: '',
     }) : {
