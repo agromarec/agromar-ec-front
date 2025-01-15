@@ -6,11 +6,12 @@ import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatMessages } from "@/components/chat/ChatMessages";
 import { ChatForm } from "@/components/chat/ChatForm";
 import useAuthStore from "@/store/authStore";
+import { globalVariables } from "@/config/globalVariables";
 
 export const ChatPage = () => {
   const user = useAuthStore(state => state.user);
   // const { on, emit } = useSocket({ url: 'http://localhost:3001/' });
-  const { on, emit } = useSocket({ url: 'https://agromar-ec.vercel.app/' });
+  const { on, emit } = useSocket({ url: globalVariables.apiUrl + '/' });
   const loadChatUsers = useChatStore(state => state.loadChatUsers);
   const createMessage = useChatStore(state => state.createMessage);
   const onUserConnect = useChatStore(state => state.onUserConnect);

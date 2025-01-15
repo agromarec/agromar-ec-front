@@ -87,7 +87,7 @@ export const PrivateOptions = () => {
           <DropdownMenuSeparator />
 
           {
-            user?.user_role.some(role => role.roleId === Roles.ADMIN) ? (
+            user?.user_role?.some(role => role.roleId === Roles.ADMIN) ? (
               <NavLink to={ValidRoutes.ADMIN}>
                 <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
                   <Settings />

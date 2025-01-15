@@ -12,7 +12,7 @@ import { IPredifinedProductResponse } from "@/interfaces/predifined-product";
 import { formatter, to } from "@/helpers";
 import { Textarea } from "../ui/textarea";
 import { IUnitOfMesureResponse } from "@/interfaces/unit-of-mesure";
-import { IProduct, IProductResponse } from "@/interfaces/products";
+import { IProduct } from "@/interfaces/products";
 import { AgroMarApi } from "@/api/AgroMarApi";
 import { AxiosResponse } from "axios";
 import { LoaderBtn } from "../ui/LoaderBtn";
@@ -21,7 +21,7 @@ interface ProductModalFormProps {
   isOpen: boolean;
   productToUpdate?: IProduct | null;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess?: (result: IProduct) => void;
 }
 
 export const ProductModalForm = ({ isOpen, onClose, onSuccess, productToUpdate }: ProductModalFormProps) => {
@@ -52,7 +52,7 @@ const formSchema = z.object({
   .refine(data => Number(data.price.replace(',', '')) > 0, { message: "Precio no puede ser 0", path: ["price"] })
   .refine(data => (data.image?.size || 0) < 10 * 1024 * 1024, { message: "El archivo es muy pesado, por favor, suba un archivo menor de 10MB", path: ["image"] })
 
-export function CreateOrUpdateProductForm(props: { initialValues?: IProduct | null, onSuccess?: () => void, onCancel: () => void }) {
+export function CreateOrUpdateProductForm(props: { initialValues?: IProduct | null, onSuccess?: (product: IProduct) => void, onCancel: () => void }) {
   const { data: predefinedProduct } = useFetch<IPredifinedProductResponse[]>('/predefined-product');
   const { data: unitOfMesure } = useFetch<IUnitOfMesureResponse[]>('/unit-of-mesures');
   const form = useForm<z.infer<typeof formSchema>>({
@@ -86,7 +86,7 @@ export function CreateOrUpdateProductForm(props: { initialValues?: IProduct | nu
     formData.append('description', values.description);
     formData.append('unitOfMeasure', values.unitOfMeasure);
 
-    const [, error] = props.initialValues ? await to<AxiosResponse<IProductResponse>>(AgroMarApi.patch(`/products/${props.initialValues.id}`, formData)) : await to<AxiosResponse<IProductResponse>>(AgroMarApi.post('/products', formData));
+    const [response, error] = props.initialValues ? await to<AxiosResponse<IProduct>>(AgroMarApi.patch(`/products/${props.initialValues.id}`, formData)) : await to<AxiosResponse<IProduct>>(AgroMarApi.post('/products', formData));
 
     if (error) {
       toast.error(error.message);
@@ -95,7 +95,7 @@ export function CreateOrUpdateProductForm(props: { initialValues?: IProduct | nu
 
     toast.success(`Producto ${props.initialValues ? 'actualizado' : 'creado'} exitosamente`);
 
-    props.onSuccess?.();
+    props.onSuccess?.(response.data);
   }
 
 

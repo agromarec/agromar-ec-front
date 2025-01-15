@@ -6,13 +6,14 @@ import { formatter, to } from "@/helpers"
 import { PencilLine, Trash2 } from "lucide-react"
 import { useFetch } from "@/hooks";
 import { IProduct, IProductResponse } from "@/interfaces/products";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from 'react';
 import { ProductModalForm } from "@/components/products/ProductModalForm";
-import { globalVariables, Roles } from "@/config/globalVariables";
+import { Roles } from "@/config/globalVariables";
 import useUiStore from "@/store/uiStore";
 import { toast } from "sonner";
 import { AgroMarApi } from "@/api/AgroMarApi";
 import useAuthStore from "@/store/authStore";
+import { ScreenLoader } from "@/components/common/ScreenLoader";
 
 export const AdminProductsPage = () => {
   const user = useAuthStore(state => state.user);
@@ -23,16 +24,17 @@ export const AdminProductsPage = () => {
     <div className="container mx-auto my-12">
       <h1 className="text-center text-4xl font-bold mt-20 mb-4">Productos</h1>
 
-      <ProductsTableView url={user?.user_role.some(role => role.roleId === Roles.ADMIN) ? '/products?page=1&size=99999' : `/products/seller/${user?.id}`} />
+      <ProductsTableView url={user?.user_role?.some(role => role.roleId === Roles.ADMIN) ? '/products?page=1&size=99999' : `/products/seller/${user?.id}`} />
     </div>
   )
 };
 
 const ProductsTableView = ({ url }: { url: string }) => {
-  const { data, refetch } = useFetch<IProductResponse>(url);
+  const { data, refetch, loading } = useFetch<IProductResponse>(url);
   const [isOpenCreateProductModal, setIsOpenCreateProductModal] = useState(false);
   const setDialogOpts = useUiStore(state => state.setDialogOptions);
   const productToUpdateRef = useRef<IProduct | null>(null);
+  const [productsData, setProductsData] = useState<IProduct[]>([]);
 
   const columns: ColumnDef<IProduct>[] = useMemo(() => (
     [
@@ -101,7 +103,7 @@ const ProductsTableView = ({ url }: { url: string }) => {
         header: "Imágen",
         cell: ({ row }) => (
           // <div className="capitalize">{row.original.image}</div>
-          <img src={`${globalVariables.fileUrl}${row.original.image}`} alt="producto" className="w-20 h-20 rounded-lg" />
+          <img src={row.original.image ? `${row.original.image}` : '/no-image.png'} alt="producto" className="w-20 h-20 rounded-lg" />
         ),
         enableColumnFilter: false,
       },
@@ -203,11 +205,17 @@ const ProductsTableView = ({ url }: { url: string }) => {
     ]
   ), []);
 
+  useEffect(() => {
+    setProductsData(data?.products || []);
+  }, [data]);
+
   return (
     <>
+      <ScreenLoader isVisible={loading} />
+
       <DataTable
         columns={columns}
-        data={data?.products || []}
+        data={productsData}
         createText="Nuevo producto"
         onCreate={() => setIsOpenCreateProductModal(true)}
       />
@@ -219,9 +227,15 @@ const ProductsTableView = ({ url }: { url: string }) => {
           setIsOpenCreateProductModal(false);
         }}
         productToUpdate={productToUpdateRef.current}
-        onSuccess={() => {
-          refetch();
-          productToUpdateRef.current = null;
+        onSuccess={(product: IProduct) => {
+          if (productToUpdateRef.current) {
+            setProductsData(oldState => oldState.map(p => p.id == productToUpdateRef.current!.id ? ({
+              ...oldState,
+              ...product,
+            } as IProduct) : p));
+            productToUpdateRef.current = null;
+          }
+          // productToUpdateRef.current = null;
           setIsOpenCreateProductModal(false);
         }}
       />

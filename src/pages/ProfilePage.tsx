@@ -17,7 +17,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Pencil } from "lucide-react";
-import { globalVariables } from "@/config/globalVariables";
+import { ScreenLoader } from "@/components/common/ScreenLoader";
 
 
 export const ProfilePage = () => {
@@ -27,21 +27,38 @@ export const ProfilePage = () => {
   const { isOpen: isOpenPayment, toggleDisclosure: tooglePaymentModal } = useDisclousure();
   const filePicRef = useRef<HTMLInputElement>(null);
 
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [profileImage, setProfileImage] = useState(user?.profilePicture ? `${user.profilePicture}` : 'https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg');
+
   const handleChangProfilePic = async (e: any) => {
+    setIsLoading(true)
     const file = e.target.files[0];
+
+    if(!file) return;
     const formData = new FormData();
     formData.append('file', file);
 
-    await AgroMarApi.patch(`/users/profile-pic/${user?.id}`, formData, {
+    const [response, error] = await to(AgroMarApi.patch(`/users/profile-pic/${user?.id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-    });
+    }));
+    setIsLoading(false);
+    if(error) return toast.error('Ocurrió un error al actualizar la foto de perfil', { position: 'top-right' });
+    setProfileImage(response.data.profilePicture);
+    toast.success('Foto de perfil actualizada exitosamente', { position: 'top-right' });
   }
+
+  console.log({user});
+  
+  
 
   return (
     <div className="container mx-auto my-12 px-12">
       <h1 className="text-center text-2xl font-bold mt-20 mb-4">Bienvenido a tu perfil, {user?.name} {user?.lastName}</h1>
+
+      <ScreenLoader isVisible={isLoading} />
 
       <input type="file" ref={filePicRef} className="hidden"
         onChange={handleChangProfilePic}
@@ -51,9 +68,7 @@ export const ProfilePage = () => {
 
         <div className="flex flex-col w-full max-w-sm relative">
           <img
-            src={
-              user?.profilePicture ? `${globalVariables.fileUrl}profile-pictures/${user.profilePicture}` : 'https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg'
-            }
+            src={profileImage}
             alt="perfil"
             className="rounded-lg mx-auto aspect-square h-[20rem] object-cover" 
           />

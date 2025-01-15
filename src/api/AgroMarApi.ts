@@ -1,8 +1,9 @@
+import { globalVariables } from "@/config/globalVariables";
 import axios from "axios";
 
 export const AgroMarApi = axios.create({
   // baseURL: "http://localhost:3001/api",
-  baseURL: "https://agromar-ec.vercel.app/api",
+  baseURL: globalVariables.apiUrl,
 });
 
 AgroMarApi.interceptors.request.use((config) => {

@@ -49,6 +49,9 @@ const useAuthStore = create<AuthState>()((set) => ({
 
     const [response, error] = await to(AgroMarApi.get('/auth/check'));
 
+    console.log({ response, error });
+
+
     if (error) {
       localStorage.clear();
       set({ status: 'unauthenticated', error: error.message });
@@ -57,7 +60,7 @@ const useAuthStore = create<AuthState>()((set) => ({
 
     const { token, ...user } = response.data;
 
-    localStorage.setItem('token', token);
+    if (token) localStorage.setItem('token', token);
 
     set({
       status: 'authenticated',
