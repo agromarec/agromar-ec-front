@@ -234,6 +234,8 @@ const ProductsTableView = ({ url }: { url: string }) => {
               ...product,
             } as IProduct) : p));
             productToUpdateRef.current = null;
+            setIsOpenCreateProductModal(false);
+            return;
           }
           // productToUpdateRef.current = null;
           setIsOpenCreateProductModal(false);
