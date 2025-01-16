@@ -5,7 +5,6 @@ import { formatter, to } from "@/helpers";
 import { Button } from "../ui/button";
 import { Send, Trash2 } from "lucide-react";
 import useAuthStore from "@/store/authStore";
-import { globalVariables } from "@/config/globalVariables";
 import { CartButton } from "../common/CartButton";
 import { useFetch } from "@/hooks";
 import { ICommentResponse } from "@/interfaces/comments";
@@ -38,7 +37,7 @@ export const ProductDetails = ({ isOpen, onClose, product }: ProductDetailsProps
 
             <div className="flex gap-4 h-full py-12">
               {/* <div className="my-auto"> */}
-              <img src={!product.image ? '/no-image.png' : `${globalVariables.fileUrl}${product.image}`} alt={product.predefinedProduct.name} width={400} className="object-cover rounded-lg h-[280px] my-auto" />
+              <img src={!product.image ? '/no-image.png' : `${product.image}`} alt={product.predefinedProduct.name} width={400} className="object-cover rounded-lg h-[280px] my-auto" />
               {/* </div> */}
 
               <DialogDescription className="flex h-full text-black w-full gap-4">
