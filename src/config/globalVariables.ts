@@ -1,8 +1,9 @@
 export const globalVariables = {
-  // apiUrl: 'http://localhost:3001/api',
-  // fileUrl: 'http://localhost:3001/api/file/',
-  apiUrl: 'https://agromar-ec.vercel.app/api',
-  fileUrl: `https://agromar-ec.vercel.app/api/file/`,
+  apiUrl: 'http://localhost:3001/api',
+  fileUrl: 'http://localhost:3001/api/file/',
+  socketUrl: 'https://chat-tesis.onrender.com/',
+  // apiUrl: 'https://agromar-ec.vercel.app/api',
+  // fileUrl: `https://agromar-ec.vercel.app/api/file/`,
   tax: 0.15,
 };
 
