@@ -237,10 +237,7 @@ const ProductsTableView = ({ url }: { url: string }) => {
           }
           // productToUpdateRef.current = null;
           setIsOpenCreateProductModal(false);
-          setProductsData(state => ({
-            ...state,
-            ...product,
-          }))
+          setProductsData(state => ([...state, product]));
         }}
       />
     </>
