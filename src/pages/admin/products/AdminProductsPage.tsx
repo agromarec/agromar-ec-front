@@ -189,8 +189,9 @@ const ProductsTableView = ({ url }: { url: string }) => {
                       setDialogOpts(state => ({ ...state, isLoading: true }));
                       const [, error] = await to(AgroMarApi.delete(`/products/${rowData.id}`));
                       if (error) return toast.error(error.message);
-                      refetch();
+                      // refetch();
                       toast.success('Producto eliminado exitosamente');
+                      setProductsData(state => state.filter(product => product.id !== rowData.id));
                       setDialogOpts(state => ({ ...state, isLoading: false, open: false }));
                     },
                   })}
