@@ -16,6 +16,7 @@ export const useSocket = ({ url }: UseSocketOptions) => {
         transports: ['websocket'],
         token: localStorage.getItem('token'),
       },
+      // withCredentials: true,
     });
 
     // Actualizar el estado de conexión
