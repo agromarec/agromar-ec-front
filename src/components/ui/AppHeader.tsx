@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { DollarSign, Gavel, Handshake, Lock, LogOut, MessageSquare, Settings, ShoppingCart, Store, User } from "lucide-react";
+import { DollarSign, Lock, LogOut, MessageSquare, Settings, ShoppingCart, Store, User } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuItem } from "./dropdown-menu";
 import useAuthStore from "@/store/authStore";
 import useCartStore from "@/store/cartStore";
@@ -104,19 +104,19 @@ export const PrivateOptions = () => {
                   </DropdownMenuItem>
                 </NavLink>
 
-                <NavLink to={ValidRoutes.REQUESTS}>
+                {/* <NavLink to={ValidRoutes.REQUESTS}>
                   <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
                     <Handshake />
                     <p>Mis Solicitudes</p>
                   </DropdownMenuItem>
-                </NavLink>
+                </NavLink> */}
 
-                <NavLink to={ValidRoutes.REQUESTS}>
+                {/* <NavLink to={ValidRoutes.REQUESTS}>
                   <DropdownMenuItem className="flex items-center gap-2 hover:cursor-pointer">
                     <Gavel />
                     <p>Mis Subastas</p>
                   </DropdownMenuItem>
-                </NavLink>
+                </NavLink> */}
               </>
             )
           }

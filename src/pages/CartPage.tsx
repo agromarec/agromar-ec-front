@@ -162,7 +162,7 @@ const CartItem = ({ cartItem }: { cartItem: IProduct & { quantity: number } }) =
   return (
     <div>
       <div className="flex gap-4 mt-2">
-        <img src={!cartItem.image ? '/no-image.png' : `${globalVariables.fileUrl}${cartItem.image}`} alt={cartItem.description} width={200} height={140} className="object-cover rounded-lg my-auto max-h-200" />
+        <img src={!cartItem.image ? '/no-image.png' : `${cartItem.image}`} alt={cartItem.description} width={200} height={140} className="object-cover rounded-lg my-auto max-h-200" />
         <div className="flex flex-col gap-2 w-full">
           <p className="text-lg font-bold">{cartItem?.predefinedProduct?.name}</p>
 

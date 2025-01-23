@@ -30,7 +30,7 @@ export const AdminProductsPage = () => {
 };
 
 const ProductsTableView = ({ url }: { url: string }) => {
-  const { data, refetch, loading } = useFetch<IProductResponse>(url);
+  const { data, loading } = useFetch<IProductResponse>(url);
   const [isOpenCreateProductModal, setIsOpenCreateProductModal] = useState(false);
   const setDialogOpts = useUiStore(state => state.setDialogOptions);
   const productToUpdateRef = useRef<IProduct | null>(null);

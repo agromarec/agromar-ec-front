@@ -1,5 +1,5 @@
 import { useFetch } from "@/hooks"
-import { Gavel, Handshake, LucideProps, PencilRuler, Shapes, ShoppingBasket, Store, Users } from "lucide-react"
+import { LucideProps, PencilRuler, Shapes, ShoppingBasket, Store, Users } from "lucide-react"
 import { RefAttributes, useMemo } from "react"
 import { Link } from "react-router-dom"
 
@@ -21,20 +21,20 @@ export function AdminPage() {
       href: '/admin/products',
       bgColor: 'bg-indigo-400',
     },
-    {
-      label: 'Solicitudes',
-      count: data?.requestQuantity || 0,
-      icon: (props: Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>) => <Handshake {...props} />,
-      href: '/admin/solicitudes',
-      bgColor: 'bg-orange-400',
-    },
-    {
-      label: 'Subastas',
-      count: data?.salesQuantity || 0,
-      icon: (props: Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>) => <Gavel {...props} />,
-      href: '/admin/subastas',
-      bgColor: 'bg-red-400',
-    },
+    // {
+    //   label: 'Solicitudes',
+    //   count: data?.requestQuantity || 0,
+    //   icon: (props: Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>) => <Handshake {...props} />,
+    //   href: '/admin/solicitudes',
+    //   bgColor: 'bg-orange-400',
+    // },
+    // {
+    //   label: 'Subastas',
+    //   count: data?.salesQuantity || 0,
+    //   icon: (props: Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>) => <Gavel {...props} />,
+    //   href: '/admin/subastas',
+    //   bgColor: 'bg-red-400',
+    // },
     {
       label: 'Categorías',
       count: data?.productCategoryQuantity || 0,
