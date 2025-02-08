@@ -58,7 +58,7 @@ export const CartPage = () => {
         </div>
 
         <div className="flex flex-col gap-4 basis-[28%] border-2 border-gray-300 rounded-lg p-4 flex-1/2 h-fit">
-          <p className="py-2 px-4 text-center text-sm font-bold bg-orange-500 text-white">Facturación Electrónica</p>
+          <p className="py-2 px-4 text-center text-sm font-bold bg-primary text-white">Facturación Electrónica</p>
 
           <p className="font-bold text-xl">Entrega</p>
           <p>
@@ -66,6 +66,8 @@ export const CartPage = () => {
             exportacion, brindando productos de la mas alta
             calidad para impulsar su negocio.
           </p>
+
+          <QuoteButton />
 
           <div className="grid grid-cols-2 gap-4 mt-4 mx-auto w-full text-xl">
             <p>SubTotal</p>
@@ -75,7 +77,8 @@ export const CartPage = () => {
             <p className="text-end">{formatter({ value: subtotal * globalVariables.tax })}</p>
 
             <p>Total</p>
-            <p className="font-bold text-end">{formatter({ value: total })}</p>
+            {/* <p className="font-bold text-end">{formatter({ value: total })}</p> */}
+            <p className="font-bold text-end">{formatter({ value: total + subtotal * globalVariables.tax })}</p>
           </div>
 
 
@@ -119,9 +122,6 @@ export const CartPage = () => {
             sellerInfo?.allowPaypalPayments &&
             <Paypal />
           }
-
-
-          <QuoteButton />
         </div>
       </div>
 

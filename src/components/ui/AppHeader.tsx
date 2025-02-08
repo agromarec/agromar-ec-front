@@ -54,7 +54,7 @@ export const PrivateOptions = () => {
 
   return (
     <>
-      <NavLink to={'/cart'}>
+      <NavLink to={'/cart'} className='mr-4'>
         <div className="relative">
           <ShoppingCart size={20} fill="white" />
 
@@ -64,8 +64,10 @@ export const PrivateOptions = () => {
         </div>
       </NavLink>
 
+
       <DropdownMenu>
-        <DropdownMenuTrigger className="focus:outline-none">
+        <DropdownMenuTrigger className="focus:outline-none flex gap-2 items-center">
+          <p>Hola, {user?.name}</p>
           <User size={20} fill="white" />
         </DropdownMenuTrigger>
 

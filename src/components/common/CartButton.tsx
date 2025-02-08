@@ -5,6 +5,7 @@ import useCartStore from "@/store/cartStore";
 import { useState, useEffect, useRef } from 'react';
 import { IProduct } from "@/interfaces/products";
 import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 interface CartButtonProps {
   type?: 'solid' | 'ghost'
@@ -34,9 +35,18 @@ export const CartButton = ({ product, type = 'ghost' }: CartButtonProps) => {
           <>
             {
               type === 'ghost' ? (
-                <Button variant="ghost" size="icon" className="[&_svg]:size-6" onClick={() => onOpenAuthModal()}>
-                  <ShoppingCart size={20} strokeWidth={2} />
-                </Button>
+                <TooltipProvider delayDuration={100}>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button variant="ghost" size="icon" className="[&_svg]:size-6" onClick={() => onOpenAuthModal()}>
+                        <ShoppingCart size={20} strokeWidth={2} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="TooltipContent" sideOffset={5}>
+                      <p>Agregar al carrito</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               ) : (
                 <Button variant="default" size="icon" className="[&_svg]:size-6 w-full" onClick={() => onOpenAuthModal()}>
                   Agregar al carrito <ShoppingCart size={20} strokeWidth={2} />
@@ -84,9 +94,18 @@ export const CartButtonAction = ({ product, type }: CartButtonProps) => {
           <>
             {
               type === 'ghost' ? (
-                <Button variant="ghost" size="icon" className="[&_svg]:size-6" onClick={() => onAddToCart()}>
-                  <ShoppingCart size={20} strokeWidth={2} />
-                </Button>
+                <TooltipProvider delayDuration={100}>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button variant="ghost" size="icon" className="[&_svg]:size-6" onClick={() => onAddToCart()}>
+                        <ShoppingCart size={20} strokeWidth={2} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="TooltipContent" sideOffset={5}>
+                      <p>Agregar al carrito</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               ) : (
                 <Button variant="default" size="icon" className="[&_svg]:size-6 w-full" onClick={() => onAddToCart()}>
                   Agregar al carrito <ShoppingCart size={20} strokeWidth={2} />

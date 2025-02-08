@@ -6,6 +6,8 @@ import useCartStore from '@/store/cartStore';
 import { IProduct } from '@/interfaces/products';
 import { formatter } from '@/helpers';
 import { globalVariables } from '@/config/globalVariables';
+import useAuthStore from '@/store/authStore';
+import { IUserResponse } from '@/interfaces/users';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -14,32 +16,52 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff'
   },
   section: {
-    margin: 10,
-    padding: 10,
+    // margin: 10,
+    // padding: 10,
   }
 });
 
 // Create Document Component
-const QuoteDocument = (cartItems: (IProduct & { quantity: number; })[],  { total, subtotal }: any) => (
+const QuoteDocument = (cartItems: (IProduct & { quantity: number; })[], { total, subtotal }: any, user: IUserResponse) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={{ flexDirection: 'column', width: '100%', paddingHorizontal: 40 }}>
-        <View style={styles.section}>
+
+        <View style={{ marginVertical: 20 }}>
+          <Text style={{ fontSize: 12, marginBottom: 10 }}>
+            {
+              formatter({ date: new Date(), as: 'date', dateStyle: 'full', language: 'es' }).charAt(0).toUpperCase() + formatter({ date: new Date(), as: 'date', dateStyle: 'full', language: 'es' }).slice(1)
+            }
+          </Text>
+
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Cotización</Text>
-            <Image src={'/logo.jpeg'} style={{ width: 140, height: 50 }} />
+            {/* <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Cotización</Text> */}
+            <Text style={{ fontSize: 10, fontWeight: 'bold', maxWidth: 250 }}>Estimado {user.name} {user.lastName}, se adjunta la cotización de la compra de los productos que has solicitado.</Text>
+
+            <Image src={'/logo.jpeg'} style={{ width: 130, height: 45, marginTop: -14 }} />
           </View>
         </View>
+
+
+        <Text style={{ fontSize: 22, fontWeight: 'bold' }}>Detalles de la Cotización</Text>
+        <View 
+          style={{
+            borderBottomWidth: 1,
+            borderColor: 'black',
+            paddingBottom: 10,
+            marginBottom: 14
+          }}
+        />
 
         <View style={{
           justifyContent: 'space-between',
           flexDirection: 'row',
           marginBottom: 4
         }}>
-          <Text style={{ fontSize: 10, flexBasis: '50%', textAlign: 'left' }}>Nombre</Text>
-          <Text style={{ fontSize: 10, flexBasis: '10%', textAlign: 'right' }}>Cantidad</Text>
-          <Text style={{ fontSize: 10, flexBasis: '20%', textAlign: 'right' }}>Precio Unitario</Text>
-          <Text style={{ fontSize: 10, flexBasis: '20%', textAlign: 'right' }}>Total</Text>
+          <Text style={{ fontSize: 12, flexBasis: '50%', textAlign: 'left' }}>Nombre</Text>
+          <Text style={{ fontSize: 12, flexBasis: '12%', textAlign: 'right' }}>Cantidad</Text>
+          <Text style={{ fontSize: 12, flexBasis: '20%', textAlign: 'right' }}>Precio Unitario</Text>
+          <Text style={{ fontSize: 12, flexBasis: '20%', textAlign: 'right' }}>Total</Text>
         </View>
 
         <View style={{ justifyContent: 'space-between' }}>
@@ -73,6 +95,7 @@ const QuoteDocument = (cartItems: (IProduct & { quantity: number; })[],  { total
 
 
 export const QuoteButton = () => {
+  const user = useAuthStore(state => state.user);
   const cartItems = useCartStore(state => state.cartItems);
   const total = useCartStore(state => state.total);
   const tax = useCartStore(state => state.tax);
@@ -83,15 +106,17 @@ export const QuoteButton = () => {
   useEffect(() => {
     updateInstance(QuoteDocument(
       Object.keys(cartItems).map(cartItemKey => cartItems[cartItemKey as any]),
-      { total, subtotal, tax }
+      { total, subtotal, tax },
+      user!
     ));
-  }, [cartItems, updateInstance, tax, total, subtotal]);
+  }, [cartItems, updateInstance, tax, total, subtotal, user]);
 
   return (
     <>
       <Button
         variant={'outline'}
         onClick={() => setQuoteModal(true)}
+        className='bg-orange-500 text-white font-bold hover:bg-orange-600 hover:text-white'
       >Solicitar cotización</Button>
 
       <CustomDialog
@@ -113,7 +138,7 @@ export const QuoteButton = () => {
               className='max-w-fit'
               onClick={() => {
                 const url = instance.url;
-                if(!url) return;
+                if (!url) return;
                 window.open(url, '_blank');
               }}>
               Descargar Cotización</Button>
