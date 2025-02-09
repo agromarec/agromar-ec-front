@@ -44,6 +44,10 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: allowedPageSizes ? allowedPageSizes[0] : 10,
+  });
 
   const table = useReactTable({
     data,
@@ -56,15 +60,13 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
-      pagination: {
-        pageSize: allowedPageSizes ? allowedPageSizes[0] : 10,
-        pageIndex: 0,
-      },
+      pagination: pagination,
     },
   })
 

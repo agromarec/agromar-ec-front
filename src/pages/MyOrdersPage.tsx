@@ -1,18 +1,20 @@
 import { AgroMarApi } from "@/api/AgroMarApi";
 import { DataTable } from "@/components/data-table";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { formatter, to } from "@/helpers";
 import { useDisclousure, useFetch } from "@/hooks";
 import { IOrderDetailsResponse, IOrderResponse } from "@/interfaces/order";
 import { ColumnDef } from "@tanstack/react-table";
+import { Info } from "lucide-react";
 import { useMemo, useRef, useState } from 'react';
 import { toast } from "sonner";
 
 export const MyOrdersPage = () => {
   const { data } = useFetch<IOrderResponse[]>('/orders');
   const { isOpen, toggleDisclosure } = useDisclousure();
-  
+
   const [orderDetails, setOrderDetails] = useState<IOrderDetailsResponse[]>([]);
   const aditionalInfoRef = useRef<any>(null);
 
@@ -61,7 +63,7 @@ export const MyOrdersPage = () => {
           <Button variant="link" className="h-8 w-8 p-0 m-auto flex text-indigo-500" size="sm" color="primary"
             onClick={async () => {
               const [response, error] = await to(AgroMarApi.get<IOrderDetailsResponse[]>(`/orders/details/${row.original.id_order}`));
-              if(error) return toast.error(error.message);
+              if (error) return toast.error(error.message);
               aditionalInfoRef.current = {
                 comprador: `${row.original.user_ce.name} ${row.original.user_ce.lastName}`,
                 total: formatter({ value: row.original.total }),
@@ -81,6 +83,14 @@ export const MyOrdersPage = () => {
   return (
     <div className="container mx-auto my-12">
       <h1 className="text-center text-4xl font-bold mt-20 mb-4">Mis órdenes</h1>
+
+      <Alert className="mt-8 mb-4">
+        <Info className="h-4 w-4" />
+        <AlertTitle>Nota Importante!</AlertTitle>
+        <AlertDescription>
+          Una vez se recepte el pago se enviará un correo electrónico con los inidcaciones para el retiro de su producto en las oficinas de AgroMarEc.
+        </AlertDescription>
+      </Alert>
 
       <DataTable
         columns={columns}
@@ -172,7 +182,7 @@ export const DetailsModal = ({ orderDetails, aditionalInfo, isOpen, onClose }: D
         <DialogHeader>
           <DialogTitle>Detalles de la órden</DialogTitle>
           <DialogDescription>
-            
+
             <p className="mt-3">Información del comprador</p>
             <div className="flex justify-between mt-4">
               <p>Nombre: {aditionalInfo?.comprador}</p>

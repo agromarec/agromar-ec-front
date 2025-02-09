@@ -26,6 +26,40 @@ export const CartPage = () => {
     return cartItems[(Object.keys(cartItems)[0] as any)]?.user_ce as any;
   }, [cartItems]);
 
+  const firstBankInfo = useMemo(() => {
+    let result = '';
+    if (!sellerInfo?.bankTransfersInfo) return '';
+    const bankTransfersInfo = sellerInfo.bankTransfersInfo.split('-');
+
+    if (sellerInfo.bankTransfersInfo) {
+      const hasAllInfo = bankTransfersInfo[0] && bankTransfersInfo[1] && bankTransfersInfo[2] && bankTransfersInfo[3] && bankTransfersInfo[4] && bankTransfersInfo[5];
+      if (!hasAllInfo) return '';
+      result += bankTransfersInfo[0] + '\n';
+      result += '# de Cuenta' + bankTransfersInfo[1] + '\n';
+      result += bankTransfersInfo[2] + '\n';
+      result += 'Cédula o RUC' + bankTransfersInfo[3] + '\n';
+      result += bankTransfersInfo[4] + '\n';
+    }
+    return result;
+  }, [sellerInfo]);
+
+  const secondBankInfo = useMemo(() => {
+    let result = '';
+    if (!sellerInfo?.bankTransfersInfo) return '';
+    const bankTransfersInfo = sellerInfo.bankTransfersInfo.split('-');
+
+    if (sellerInfo.bankTransfersInfo) {
+      const hasAllInfo = bankTransfersInfo[5] && bankTransfersInfo[6] && bankTransfersInfo[7] && bankTransfersInfo[8] && bankTransfersInfo[9];
+      if (!hasAllInfo) return '';
+      result += bankTransfersInfo[5] + '\n';
+      result += '# de Cuenta' + bankTransfersInfo[6] + '\n';
+      result += bankTransfersInfo[7] + '\n';
+      result += 'Cédula o RUC' + bankTransfersInfo[8] + '\n';
+      result += bankTransfersInfo[9] + '\n';
+    }
+    return result;
+  }, [sellerInfo]);
+
 
   if (Object.keys(cartItems).length === 0) return (
     <div className="container mx-auto pb-12">
@@ -103,12 +137,12 @@ export const CartPage = () => {
                     after:border
                     overflow-auto
                 ">
-              <textarea
+                <textarea
                   className="w-full text-slate-600 bg-slate-100 border border-transparent hover:border-slate-200 appearance-none rounded-md px-3.5 py-2.5 outline-none focus:bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 h-full min-h-40 text-lg overflow-auto cursor-default"
                   name="message"
                   id="message"
                   readOnly
-                  value={sellerInfo.bankTransfersInfo}
+                  value={`${firstBankInfo}${secondBankInfo}`}
                 ></textarea>
               </div>
 
@@ -125,7 +159,7 @@ export const CartPage = () => {
         </div>
       </div>
 
-      <CustomDialog 
+      <CustomDialog
         isOpen={transferModal}
         onOpenChange={setTransferModal}
         title="Transferencia bancaria"
@@ -139,11 +173,11 @@ export const CartPage = () => {
               <Button className="my-2"
                 onClick={async () => {
                   const [, error] = await to(AgroMarApi.post('/payment/bank-transfer', {
-                    amount: sellerInfo.bankTransfersInfo,
-                    paypalEmail: sellerInfo.paypalEmail,
+                    // amount: sellerInfo.bankTransfersInfo,
+                    // paypalEmail: sellerInfo.paypalEmail,
                   }));
 
-                  if(error) return toast.error(error.message);
+                  if (error) return toast.error(error.message);
                   toast.success('Transferencia realizada exitosamente');
                   emptyCartAsync();
                   navigate('/usuario/mis-compras');

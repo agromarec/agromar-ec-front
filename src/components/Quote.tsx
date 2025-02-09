@@ -5,7 +5,7 @@ import { CustomDialog } from './ui/CustomDialog';
 import useCartStore from '@/store/cartStore';
 import { IProduct } from '@/interfaces/products';
 import { formatter } from '@/helpers';
-import { globalVariables } from '@/config/globalVariables';
+// import { globalVariables } from '@/config/globalVariables';
 import useAuthStore from '@/store/authStore';
 import { IUserResponse } from '@/interfaces/users';
 
@@ -85,8 +85,8 @@ const QuoteDocument = (cartItems: (IProduct & { quantity: number; })[], { total,
 
         <View style={{ marginTop: 4 }}>
           <Text style={{ fontSize: 16, marginTop: 8, textAlign: 'right' }}>SubTotal: {formatter({ value: subtotal })}</Text>
-          <Text style={{ fontSize: 16, marginTop: 8, textAlign: 'right' }}>Iva: 15%</Text>
-          <Text style={{ fontSize: 16, marginTop: 8, textAlign: 'right' }}>Total: {formatter({ value: total + subtotal * globalVariables.tax })}</Text>
+          {/* <Text style={{ fontSize: 16, marginTop: 8, textAlign: 'right' }}>Iva: 15%</Text> */}
+          <Text style={{ fontSize: 16, marginTop: 8, textAlign: 'right' }}>Total: {formatter({ value: total + subtotal })}</Text>
         </View>
       </View>
     </Page>

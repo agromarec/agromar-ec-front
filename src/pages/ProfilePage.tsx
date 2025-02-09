@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Pencil } from "lucide-react";
 import { ScreenLoader } from "@/components/common/ScreenLoader";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 
 export const ProfilePage = () => {
@@ -35,7 +36,7 @@ export const ProfilePage = () => {
     setIsLoading(true)
     const file = e.target.files[0];
 
-    if(!file) return;
+    if (!file) return;
     const formData = new FormData();
     formData.append('file', file);
 
@@ -45,14 +46,10 @@ export const ProfilePage = () => {
       },
     }));
     setIsLoading(false);
-    if(error) return toast.error('Ocurrió un error al actualizar la foto de perfil', { position: 'top-right' });
+    if (error) return toast.error('Ocurrió un error al actualizar la foto de perfil', { position: 'top-right' });
     setProfileImage(response.data.profilePicture);
     toast.success('Foto de perfil actualizada exitosamente', { position: 'top-right' });
   }
-
-  console.log({user});
-  
-  
 
   return (
     <div className="container mx-auto my-12 px-12">
@@ -70,7 +67,7 @@ export const ProfilePage = () => {
           <img
             src={profileImage}
             alt="perfil"
-            className="rounded-lg mx-auto aspect-square h-[20rem] object-cover" 
+            className="rounded-lg mx-auto aspect-square h-[20rem] object-cover"
           />
 
           <p
@@ -176,6 +173,42 @@ export const ProfilePage = () => {
 
           <SellerDescriptionFrom initialDescription={user?.businessDescription} />
         </div>
+
+        {
+          user?.allowBankTransfers && !!user.bankTransfersInfo?.trim().length &&
+          <div>
+            <p className="mb-2 text-xl font-semibold">Información de transferencia</p>
+
+            <div className="grid grid-cols-2 gap-4">
+              <p className="text-sm font-bold">Tipo de cuenta</p>
+              <p className="text-sm">{user.bankTransfersInfo?.split('-')[0]}</p>
+              <p className="text-sm font-bold">Número de cuenta</p>
+              <p className="text-sm">{user.bankTransfersInfo?.split('-')[1]}</p>
+              <p className="text-sm font-bold">Banco</p>
+              <p className="text-sm">{user.bankTransfersInfo?.split('-')[2]}</p>
+              <p className="text-sm font-bold">CI/RUC</p>
+              <p className="text-sm">{user.bankTransfersInfo?.split('-')[3]}</p>
+              <p className="text-sm font-bold">Nombre del propietario</p>
+              <p className="text-sm">{user.bankTransfersInfo?.split('-')[4]}</p>
+            </div>
+
+            {
+              user.bankTransfersInfo?.split('-')[5] && user.bankTransfersInfo?.split('-')[6] && user.bankTransfersInfo?.split('-')[7] && user.bankTransfersInfo?.split('-')[8] && user.bankTransfersInfo?.split('-')[9] &&
+              <div className="grid grid-cols-2 gap-4 mt-10">
+                <p className="text-sm font-bold">Tipo de cuenta</p>
+                <p className="text-sm">{user.bankTransfersInfo?.split('-')[5]}</p>
+                <p className="text-sm font-bold">Número de cuenta</p>
+                <p className="text-sm">{user.bankTransfersInfo?.split('-')[6]}</p>
+                <p className="text-sm font-bold">Banco</p>
+                <p className="text-sm">{user.bankTransfersInfo?.split('-')[7]}</p>
+                <p className="text-sm font-bold">CI/RUC</p>
+                <p className="text-sm">{user.bankTransfersInfo?.split('-')[8]}</p>
+                <p className="text-sm font-bold">Nombre del propietario</p>
+                <p className="text-sm">{user.bankTransfersInfo?.split('-')[9]}</p>
+              </div>
+            }
+          </div>
+        }
       </div>
 
 
@@ -188,9 +221,24 @@ export const ProfilePage = () => {
         isOpen={isOpenPayment}
         onOpenChange={tooglePaymentModal}
         title="Métodos de pago"
+        className="max-w-[950px]"
         content={() =>
           <PaymentMethodsForm
-            initialValues={{ allowBankTransfers: !!user?.allowBankTransfers, allowPaypalPayments: !!user?.allowPaypalPayments, bankTransfersInfo: user?.bankTransfersInfo || '' }}
+            initialValues={{
+              allowBankTransfers: !!user?.allowBankTransfers,
+              allowPaypalPayments: !!user?.allowPaypalPayments,
+              // bankTransfersInfo: user?.bankTransfersInfo || '',
+              accountType: user?.bankTransfersInfo?.split('-')[0] || '',
+              accountNumber: user?.bankTransfersInfo?.split('-')[1] || '',
+              bankName: user?.bankTransfersInfo?.split('-')[2] || '',
+              ciOrRuc: user?.bankTransfersInfo?.split('-')[3] || '',
+              ownerName: user?.bankTransfersInfo?.split('-')[4] || '',
+              accountType2: user?.bankTransfersInfo?.split('-')[5] || '',
+              accountNumber2: user?.bankTransfersInfo?.split('-')[6] || '',
+              bankName2: user?.bankTransfersInfo?.split('-')[7] || '',
+              ciOrRuc2: user?.bankTransfersInfo?.split('-')[8] || '',
+              ownerName2: user?.bankTransfersInfo?.split('-')[9] || '',
+            }}
             onSuccess={() => {
               tooglePaymentModal()
               checkAuth();
@@ -341,10 +389,29 @@ const FormSchema = z.object({
   allowPaypalPayments: z.boolean().default(false),
   allowBankTransfers: z.boolean().default(false),
   bankTransfersInfo: z.string().optional(),
-}).refine(data => !!data.bankTransfersInfo, {
+  accountType: z.string().optional(),
+  accountNumber: z.string().optional(),
+  bankName: z.string().optional(),
+  ciOrRuc: z.string().optional(),
+  ownerName: z.string().optional(),
+  accountType2: z.string().optional(),
+  accountNumber2: z.string().optional(),
+  bankName2: z.string().optional(),
+  ciOrRuc2: z.string().optional(),
+  ownerName2: z.string().optional(),
+}).refine(data => !data.allowBankTransfers || !!data.accountNumber, {
   message: "La información de transferencia es obligatoria",
-  path: ["bankTransfersInfo"],
-});
+  path: ["accountNumber"],
+}).refine(data => !data.allowBankTransfers || !!data.bankName, {
+  message: "La información de transferencia es obligatoria",
+  path: ["bankName"],
+}).refine(data => !data.allowBankTransfers || !!data.ciOrRuc, {
+  message: "La información de transferencia es obligatoria",
+  path: ["ciOrRuc"],
+}).refine(data => !data.allowBankTransfers || !!data.ownerName, {
+  message: "La información de transferencia es obligatoria",
+  path: ["ownerName"],
+})
 
 export function PaymentMethodsForm({ initialValues, onSuccess }: { initialValues?: z.infer<typeof FormSchema>; onSuccess?: () => void }) {
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -357,8 +424,14 @@ export function PaymentMethodsForm({ initialValues, onSuccess }: { initialValues
   })
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
+    const { bankName2, ciOrRuc2, accountType2, accountType, ownerName2, accountNumber2, bankName, accountNumber, ciOrRuc, ownerName, ...rest } = data;
+
+    if (rest.allowBankTransfers) {
+      rest.bankTransfersInfo = `${accountType}-${accountNumber}-${bankName}-${ciOrRuc}-${ownerName}-${accountType2 || ''}-${accountNumber2 || ''}-${bankName2 || ''}-${ciOrRuc2 || ''}-${ownerName2 || ''}`;
+    }
+
     const [, error] = await to(AgroMarApi.post('auth/update-payment-methods', {
-      ...data
+      ...rest
     }));
 
     if (error) return toast.error(error.message);
@@ -416,7 +489,7 @@ export function PaymentMethodsForm({ initialValues, onSuccess }: { initialValues
               )}
             />
 
-            {
+            {/* {
               form.watch('allowBankTransfers') &&
               <FormField
                 control={form.control}
@@ -432,7 +505,311 @@ export function PaymentMethodsForm({ initialValues, onSuccess }: { initialValues
                   </FormItem>
                 )}
               />
+            } */}
+
+            <div className="grid grid-cols-2 gap-4">
+              {
+                form.watch('allowBankTransfers') &&
+                <FormField
+                  control={form.control}
+                  name="accountType"
+                  render={({ field }) => (
+                    <FormItem className="mx-auto w-full">
+                      <FormLabel>Tipo de Cuenta</FormLabel>
+                      {/* <FormControl> */}
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={'Tipo de cuenta'} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value={'CUENTA DE AHORROS'}>
+                            CUENTA DE AHORROS
+                          </SelectItem>
+
+                          <SelectItem value={'CUENTA CORRIENTE'}>
+                            CUENTA CORRIENTE
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {/* </FormControl> */}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              }
+
+              {
+                form.watch('allowBankTransfers') &&
+                <FormField
+                  control={form.control}
+                  name="accountNumber"
+                  render={({ field }) => (
+                    <FormItem className="mx-auto w-full">
+                      <FormLabel>Número de cuenta</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Número de cuenta"
+                          className="cursor-default flex-1"
+                          {...field}
+                          onKeyDown={e => {
+                            // const currentValue = Number(field.value);
+                            const allowedKeys = ['ArrowLeft', 'ArrowRight', 'Backspace', 'Delete', 'Tab', 'Escape', 'Enter'];
+                            const onlyNumbersAndDot = /^[0-9.]+$/;
+                            // const alreadyHasDot = currentValue.toString().includes('.');
+
+                            if (!onlyNumbersAndDot.test(e.key) && !allowedKeys.includes(e.key)) e.preventDefault();
+                            if (e.key === '.') e.preventDefault();
+                          }}
+                        />
+                        {/* <Textarea value={field.value} onChange={e => field.onChange(e.target.value)} placeholder="Información de transferencia"
+                          className="resize-none h-32 rounded-lg border-2 border-gray-300" /> */}
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              }
+
+              {
+                form.watch('allowBankTransfers') &&
+                <FormField
+                  control={form.control}
+                  name="bankName"
+                  render={({ field }) => (
+                    <FormItem className="mx-auto w-full">
+                      <FormLabel>Banco</FormLabel>
+                      {/* <FormControl> */}
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={'Banco'} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value={'BANCO DE GUAYAQUIL'}>
+                            BANCO DE GUAYAQUIL
+                          </SelectItem>
+
+                          <SelectItem value={'BANCO DEL PACIFICO'}>
+                            BANCO DEL PACIFICO
+                          </SelectItem>
+
+                          <SelectItem value={'BANCO DE PICHINCHA'}>
+                            BANCO DE PICHINCHA
+                          </SelectItem>
+
+                          <SelectItem value={'BANCO DEL AUSTRO'}>
+                            BANCO DEL AUSTRO
+                          </SelectItem>
+
+                          <SelectItem value={'BANCO PRODUBANCO'}>
+                            BANCO PRODUBANCO
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {/* </FormControl> */}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              }
+
+              {
+                form.watch('allowBankTransfers') &&
+                <FormField
+                  control={form.control}
+                  name="ciOrRuc"
+                  render={({ field }) => (
+                    <FormItem className="mx-auto w-full">
+                      <FormLabel>CI/RUC</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="CI/RUC"
+                          className="flex-1"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              }
+
+              {
+                form.watch('allowBankTransfers') &&
+                <FormField
+                  control={form.control}
+                  name="ownerName"
+                  render={({ field }) => (
+                    <FormItem className="mx-auto w-full">
+                      <FormLabel>Nombre del propietario</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Nombre del propietario"
+                          className="flex-1"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              }
+            </div>
+
+            {
+              form.watch('allowBankTransfers') &&
+              <p className="mb-2 text-xl font-semibold">Información de transferencia (opcional)</p>
             }
+
+            <div className="grid grid-cols-2 gap-4">
+              {
+                form.watch('allowBankTransfers') &&
+                <FormField
+                  control={form.control}
+                  name="accountType2"
+                  render={({ field }) => (
+                    <FormItem className="mx-auto w-full">
+                      <FormLabel>Tipo de Cuenta</FormLabel>
+                      {/* <FormControl> */}
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={'Tipo de cuenta'} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value={'CUENTA DE AHORROS'}>
+                            CUENTA DE AHORROS
+                          </SelectItem>
+
+                          <SelectItem value={'CUENTA CORRIENTE'}>
+                            CUENTA CORRIENTE
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {/* </FormControl> */}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              }
+
+              {
+                form.watch('allowBankTransfers') &&
+                <FormField
+                  control={form.control}
+                  name="accountNumber2"
+                  render={({ field }) => (
+                    <FormItem className="mx-auto w-full">
+                      <FormLabel>Número de cuenta</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Número de cuenta"
+                          className="cursor-default flex-1"
+                          {...field}
+                          onKeyDown={e => {
+                            const allowedKeys = ['ArrowLeft', 'ArrowRight', 'Backspace', 'Delete', 'Tab', 'Escape', 'Enter'];
+                            const onlyNumbersAndDot = /^[0-9.]+$/;
+                            if (!onlyNumbersAndDot.test(e.key) && !allowedKeys.includes(e.key)) e.preventDefault();
+                            if (e.key === '.') e.preventDefault();
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              }
+
+              {
+                form.watch('allowBankTransfers') &&
+                <FormField
+                  control={form.control}
+                  name="bankName2"
+                  render={({ field }) => (
+                    <FormItem className="mx-auto w-full">
+                      <FormLabel>Banco</FormLabel>
+                      {/* <FormControl> */}
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={'Banco'} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value={'BANCO DE GUAYAQUIL'}>
+                            BANCO DE GUAYAQUIL
+                          </SelectItem>
+
+                          <SelectItem value={'BANCO DEL PACIFICO'}>
+                            BANCO DEL PACIFICO
+                          </SelectItem>
+
+                          <SelectItem value={'BANCO DE PICHINCHA'}>
+                            BANCO DE PICHINCHA
+                          </SelectItem>
+
+                          <SelectItem value={'BANCO DEL AUSTRO'}>
+                            BANCO DEL AUSTRO
+                          </SelectItem>
+
+                          <SelectItem value={'BANCO PRODUBANCO'}>
+                            BANCO PRODUBANCO
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {/* </FormControl> */}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              }
+
+              {
+                form.watch('allowBankTransfers') &&
+                <FormField
+                  control={form.control}
+                  name="ciOrRuc2"
+                  render={({ field }) => (
+                    <FormItem className="mx-auto w-full">
+                      <FormLabel>CI/RUC</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="CI/RUC"
+                          className="flex-1"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              }
+
+              {
+                form.watch('allowBankTransfers') &&
+                <FormField
+                  control={form.control}
+                  name="ownerName2"
+                  render={({ field }) => (
+                    <FormItem className="mx-auto w-full">
+                      <FormLabel>Nombre del propietario</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Nombre del propietario"
+                          className="flex-1"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              }
+            </div>
           </div>
         </div>
 
